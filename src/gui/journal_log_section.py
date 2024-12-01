@@ -1,6 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QPushButton
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QFrame
+)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+from img.font.font import FontManager  # Import your FontManager
+
 
 class JournalLogSection(QWidget):
     def __init__(self):
@@ -9,132 +13,176 @@ class JournalLogSection(QWidget):
 
     def setup_journal_log_section(self):
         """Setup content for the journal log section"""
-        # Main layout for the journal log section
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(10)  # Adjust spacing between widgets
-        main_layout.setContentsMargins(10, 10, 10, 10)  # Add some outer margins for better spacing
+        # Initialize FontManager
+        font_manager = FontManager()
 
-        # Title: "Jurnal Log"
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(5)
+        main_layout.setContentsMargins(0, 20, 0, 40)
+
+        # Title "Beranda"
         title_label = QLabel("Jurnal Log")
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
-        title_label.setAlignment(Qt.AlignLeft)
+        title_label.setFont(font_manager.get_font("bold", 24))  # Use bold font
+        title_label.setContentsMargins(10, 0, 0, 0)
+        title_label.setAlignment(Qt.AlignTop)
         main_layout.addWidget(title_label)
 
         # Separator
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
-        separator.setStyleSheet("border: 1px solid black; background-color: black;")
-        main_layout.addWidget(separator)
+        separator.setStyleSheet("border: 3px solid gray; background-color: black;")
+        separator.setFixedWidth(int(self.width() * 2.1))  # Set width as 80% of the parent widget's width
+        main_layout.addWidget(separator, alignment=Qt.AlignHCenter)
 
-        # Button layout: "Buat Jurnal" and "Cari Jurnal"
-        button_layout = QHBoxLayout()
-        button_layout.setAlignment(Qt.AlignLeft)
+        # Subtitle "Daftar Jurnal Perjalanan"
+        subtitle_label = QLabel("Lakukan Pencarian")
+        subtitle_label.setFont(font_manager.get_font("regular", 18))  # Use regular font
+        subtitle_label.setContentsMargins(20, 0, 0, 5)
+        main_layout.addWidget(subtitle_label)
+        
+        # Search Bar and Filter Layout
+        filter_layout = QHBoxLayout()
+        filter_layout.setSpacing(10)
+        filter_layout.setContentsMargins(20, 0, 20, 100)
+        filter_layout.setAlignment(Qt.AlignLeft)
 
-        # "Buat Jurnal" button
-        create_button = QPushButton("Buat Jurnal")
-        create_button.setStyleSheet("""
-            QPushButton {
-                padding: 10px 5px; 
-                margin-bottom: 20px;
-                background-color: white;
-                border: 1px solid black; 
-                color: black; 
-                font-size: 14px; 
-                border-radius: 5px;    
-            }
-            QPushButton:hover {
-                background-color: #4A86BE;
-                color: white;
-            }                            
-        """)
-        create_button.setFixedWidth(150)
-        button_layout.addWidget(create_button)
+        # Search Bar
+        search_bar = QLineEdit()
+        search_bar.setPlaceholderText("Cari Judul...")
+        search_bar.setStyleSheet("padding: 10px; font-size: 12px; border: 1px solid gray; border-radius: 15px;")
+        search_bar.setFixedWidth(500)
+        filter_layout.addWidget(search_bar)
 
-        # "Cari Jurnal" button
-        search_button = QPushButton("Cari Jurnal")
+        # Search Button
+        search_button = QPushButton("Cari")
         search_button.setStyleSheet("""
             QPushButton {
-                padding: 10px 5px; 
-                margin-bottom: 20px;
-                background-color: #1c0d52; 
-                color: white; 
-                font-size: 14px; 
-                border-radius: 5px;    
+                background-color: #1c0d52;
+                color: white;
+                padding: 10px 5px;
+                font-size: 14px;
+                border-radius: 15px;
             }
             QPushButton:hover {
                 background-color: #4A86BE;
-            }                        
+            }
         """)
-        search_button.setFixedWidth(150)
-        button_layout.addWidget(search_button)
+        search_button.setFixedWidth(100)
+        filter_layout.addWidget(search_button)
 
-        # Add button layout to the main layout
-        main_layout.addLayout(button_layout)
+        # Dropdown Filter
+        filter_dropdown = QComboBox()
+        filter_dropdown.addItems(["Filter by Negara", "Indonesia"])
+        filter_dropdown.setStyleSheet("padding: 10px; font-size: 12px; border: 1px solid gray; border-radius: 15px;")
+        filter_dropdown.setFixedWidth(150)
+        filter_layout.addWidget(filter_dropdown)
 
-        # Journal cards layout
+        # Tambah Jurnal Button
+        tambah_jurnal_button = QPushButton("Tambah Jurnal")
+        tambah_jurnal_button.setStyleSheet("""
+            QPushButton {
+                background-color: #1c0d52;
+                color: white;
+                padding: 10px 5px;
+                font-size: 14px;
+                border-radius: 15px;
+            }
+            QPushButton:hover {
+                background-color: #4A86BE;
+            }
+        """)
+        tambah_jurnal_button.setFixedWidth(150)
+        filter_layout.addWidget(tambah_jurnal_button)
+
+        # Add filter layout to the main layout
+        main_layout.addLayout(filter_layout)
+
+        # Layout for journal cards
         journal_cards_layout = QHBoxLayout()
-        journal_cards_layout.setAlignment(Qt.AlignTop)
+        journal_cards_layout.setAlignment(Qt.AlignCenter)
+        journal_cards_layout.setSpacing(50)
 
-        # Create journal cards (maximum 4 for this example)
-        for _ in range(4):
+        for _ in range(6):  # max 6
             card = QWidget()
             card.setObjectName("cardJournal")
             card_layout = QVBoxLayout()
-            card_layout.setContentsMargins(10, 10, 10, 10)
 
-            # Image on the card
-            image_label = QLabel()
+            # Card image
+            card_image_label = QLabel()
             pixmap = QPixmap("img/img-dummy.png").scaled(120, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            image_label.setPixmap(pixmap)
-            image_label.setObjectName("cardImage")
-            card_layout.addWidget(image_label, alignment=Qt.AlignCenter)
+            card_image_label.setPixmap(pixmap)
+            card_layout.addWidget(card_image_label, alignment=Qt.AlignCenter)
 
-            # Journal title
-            title = QLabel("Jurnal")
-            title.setObjectName("cardTitle")
-            title.setStyleSheet("font-size: 14px; font-weight: bold;")
-            card_layout.addWidget(title, alignment=Qt.AlignLeft)
+            # Card title
+            card_title = QLabel("Jurnal")
+            card_title.setFont(font_manager.get_font("bold", 14))
+            card_layout.addWidget(card_title, alignment=Qt.AlignCenter)
 
-            # Location
-            location = QLabel("Indonesia - Jakarta")
-            location.setObjectName("cardLocation")
-            location.setStyleSheet("font-size: 12px; color: gray;")
-            card_layout.addWidget(location, alignment=Qt.AlignLeft)
+            # Card location
+            card_location = QLabel("Indonesia - Jakarta")
+            card_location.setFont(font_manager.get_font("regular", 12))
+            card_layout.addWidget(card_location, alignment=Qt.AlignCenter)
 
-            # Date
-            date = QLabel("24/11/2024")
-            date.setObjectName("cardDate")
-            date.setStyleSheet("font-size: 12px; color: gray;")
-            card_layout.addWidget(date, alignment=Qt.AlignLeft)
+            # Card date
+            card_date = QLabel("01/12/2024")
+            card_date.setFont(font_manager.get_font("light", 10))
+            card_layout.addWidget(card_date, alignment=Qt.AlignCenter)
 
             card.setLayout(card_layout)
             journal_cards_layout.addWidget(card)
 
-        # Stylesheet adjustments
+        # Add journal cards layout to the main layout
+        main_layout.addLayout(journal_cards_layout)
+
+        # Set the main layout for the journal log section
+        self.setLayout(main_layout)
+        
+        # Layout for journal cards
+        journal_cards_layout = QHBoxLayout()
+        journal_cards_layout.setAlignment(Qt.AlignCenter)
+        journal_cards_layout.setSpacing(50)
+
+        for _ in range(6):  # max 6
+            card = QWidget()
+            card.setObjectName("cardJournal")
+            card_layout = QVBoxLayout()
+
+            # Card image
+            card_image_label = QLabel()
+            pixmap = QPixmap("img/img-dummy.png").scaled(120, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            card_image_label.setPixmap(pixmap)
+            card_layout.addWidget(card_image_label, alignment=Qt.AlignCenter)
+
+            # Card title
+            card_title = QLabel("Jurnal")
+            card_title.setFont(font_manager.get_font("bold", 14))
+            card_layout.addWidget(card_title, alignment=Qt.AlignCenter)
+
+            # Card location
+            card_location = QLabel("Indonesia - Jakarta")
+            card_location.setFont(font_manager.get_font("regular", 12))
+            card_layout.addWidget(card_location, alignment=Qt.AlignCenter)
+
+            # Card date
+            card_date = QLabel("01/12/2024")
+            card_date.setFont(font_manager.get_font("light", 10))
+            card_layout.addWidget(card_date, alignment=Qt.AlignCenter)
+
+            card.setLayout(card_layout)
+            journal_cards_layout.addWidget(card)
+
+        # Add journal cards layout to the main layout
+        main_layout.addLayout(journal_cards_layout)
+
+        # Set the main layout for the journal log section
+        self.setLayout(main_layout)
+
+        # Stylesheet for cards
         self.setStyleSheet("""
             QWidget#cardJournal {
                 background-color: white;
                 border: 1px solid #dcdcdc;
                 border-radius: 8px;
                 padding: 10px;
-                width: 200px;
-                margin-right: 20px; 
             }
-            QLabel#cardImage {
-                border: none;
-            }
-            QLabel#cardTitle {
-                font-size: 14px;
-                font-weight: bold;
-            }
-            QLabel#cardLocation, QLabel#cardDate {
-                font-size: 12px;
-                color: gray;
-            }        
         """)
-
-        # Add journal cards layout to the main layout
-        main_layout.addLayout(journal_cards_layout)
-
-        # Assign the layout to the journal log section
-        self.setLayout(main_layout)
