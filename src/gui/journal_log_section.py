@@ -1,9 +1,7 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QFrame
-)
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QFrame
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from img.font.font import FontManager  # Import your FontManager
+from img.font.font import FontManager 
 
 
 class JournalLogSection(QWidget):
