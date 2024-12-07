@@ -16,4 +16,3 @@ class BucketlistEntity:
     #         self.cursor.execute("SELECT * FROM bucketlist WHERE id = ?", (bucket_id,))
     #     except
 
-    # def 

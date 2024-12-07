@@ -63,6 +63,6 @@ class BucketlistController:
             return self.db_controller.readallBucketlists()
         except Exception as e:
             printf("Error getting all bucketlist: ", e)
-            return []
+            return None
 
 
