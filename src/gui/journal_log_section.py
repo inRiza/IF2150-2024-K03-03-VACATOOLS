@@ -1,17 +1,118 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QFrame
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit,
+                             QTextEdit, QFileDialog, QFormLayout, QFrame)
+from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
-from img.font.font import FontManager 
+from img.font.font import FontManager
+from src.controller.viewJournalController import JournalController
+
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QLineEdit, QComboBox, QDateEdit,
+                             QTextEdit, QFileDialog, QFormLayout, QFrame)
+from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QPixmap
+from img.font.font import FontManager
+from src.controller.viewJournalController import JournalController
+
+class TambahJurnalForm(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.controller = JournalController()  # Inisialisasi controller
+        self.gambar_path = None
+        self.setup_form()
+        
+
+    def setup_form(self):
+        """Setup form for adding a new journal entry"""
+        font_manager = FontManager()
+
+        form_layout = QFormLayout()
+
+        # Judul input
+        self.judul_input = QLineEdit()
+        self.judul_input.setPlaceholderText("Masukkan Judul Jurnal")
+        form_layout.addRow("Judul:", self.judul_input)
+
+        # Negara dropdown
+        self.negara_dropdown = QComboBox()
+        self.negara_dropdown.addItems(["Indonesia", "Malaysia", "Singapore"])  # Contoh data
+        form_layout.addRow("Negara:", self.negara_dropdown)
+
+        # Kota dropdown
+        self.kota_dropdown = QComboBox()
+        self.kota_dropdown.addItems(["Jakarta", "Surabaya", "Bandung"])  # Contoh data
+        form_layout.addRow("Kota:", self.kota_dropdown)
+
+        # Tanggal input
+        self.tanggal_input = QDateEdit(QDate.currentDate())
+        self.tanggal_input.setDisplayFormat("dd/MM/yyyy")
+        form_layout.addRow("Tanggal:", self.tanggal_input)
+
+        # Deskripsi input
+        self.deskripsi_input = QTextEdit()
+        form_layout.addRow("Deskripsi:", self.deskripsi_input)
+
+        # Tombol Pilih Gambar
+        self.gambar_input_button = QPushButton("Pilih Gambar")
+        self.gambar_input_button.clicked.connect(self.choose_image)
+        form_layout.addRow("Gambar:", self.gambar_input_button)
+
+        # Label untuk menampilkan gambar yang dipilih
+        self.gambar_label = QLabel()
+        self.gambar_label.setAlignment(Qt.AlignCenter)
+        form_layout.addRow(self.gambar_label)
+
+        # Tombol Submit
+        submit_button = QPushButton("Submit")
+        submit_button.clicked.connect(self.submit_journal)
+        form_layout.addRow(submit_button)
+
+        # Menetapkan layout ke form
+        self.setLayout(form_layout)
+
+    def choose_image(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, "Pilih Gambar", "", "Images (*.png *.jpg *.jpeg *.bmp *.gif)")
+        if file_name:
+            pixmap = QPixmap(file_name)
+            self.gambar_label.setPixmap(pixmap.scaled(200, 200, Qt.KeepAspectRatio))
+            self.gambar_path = file_name  # Ensure this is set
+
+    def submit_journal(self):
+        judul = self.judul_input.text()
+        negara = self.negara_dropdown.currentText()
+        kota = self.kota_dropdown.currentText()
+        tanggal = self.tanggal_input.date().toString("dd/MM/yyyy")
+        deskripsi = self.deskripsi_input.toPlainText()
+
+        if not hasattr(self, 'gambar_path') or not self.gambar_path:
+            print("No image selected!")
+            return
+
+        # Call controller to create a new journal
+        self.controller.create_journal(judul, negara, kota, tanggal, deskripsi, self.gambar_path)
+
+
+
+        # Reset form setelah submission
+        self.judul_input.clear()
+        self.negara_dropdown.setCurrentIndex(0)
+        self.kota_dropdown.setCurrentIndex(0)
+        self.tanggal_input.setDate(QDate.currentDate())
+        self.deskripsi_input.clear()
+        self.gambar_label.clear()  # Clear image label
+        self.gambar_path = None  # Reset image path
+
+        # Optionally, close the form after submission or reset the state
+        self.close()
+
 
 
 class JournalLogSection(QWidget):
     def __init__(self):
         super().__init__()
+        self.controller = JournalController()  # Controller untuk mengakses data jurnal
         self.setup_journal_log_section()
 
     def setup_journal_log_section(self):
         """Setup content for the journal log section"""
-        # Initialize FontManager
         font_manager = FontManager()
 
         main_layout = QVBoxLayout()
@@ -37,7 +138,7 @@ class JournalLogSection(QWidget):
         subtitle_label.setFont(font_manager.get_font("regular", 18))  # Use regular font
         subtitle_label.setContentsMargins(20, 0, 0, 5)
         main_layout.addWidget(subtitle_label)
-        
+
         # Search Bar and Filter Layout
         filter_layout = QHBoxLayout()
         filter_layout.setSpacing(10)
@@ -66,6 +167,8 @@ class JournalLogSection(QWidget):
             }
         """)
         search_button.setFixedWidth(100)
+        # Menghubungkan tombol dengan fungsi pencarian
+        search_button.clicked.connect(lambda: self.handle_search(search_bar.text()))
         filter_layout.addWidget(search_button)
 
         # Dropdown Filter
@@ -90,97 +193,23 @@ class JournalLogSection(QWidget):
             }
         """)
         tambah_jurnal_button.setFixedWidth(150)
+        tambah_jurnal_button.clicked.connect(self.open_tambah_jurnal_form)
         filter_layout.addWidget(tambah_jurnal_button)
 
         # Add filter layout to the main layout
         main_layout.addLayout(filter_layout)
 
-        # Layout for journal cards
-        journal_cards_layout = QHBoxLayout()
-        journal_cards_layout.setAlignment(Qt.AlignCenter)
-        journal_cards_layout.setSpacing(50)
-
-        for _ in range(6):  # max 6
-            card = QWidget()
-            card.setObjectName("cardJournal")
-            card_layout = QVBoxLayout()
-
-            # Card image
-            card_image_label = QLabel()
-            pixmap = QPixmap("img/img-dummy.png").scaled(120, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            card_image_label.setPixmap(pixmap)
-            card_layout.addWidget(card_image_label, alignment=Qt.AlignCenter)
-
-            # Card title
-            card_title = QLabel("Jurnal")
-            card_title.setFont(font_manager.get_font("bold", 14))
-            card_layout.addWidget(card_title, alignment=Qt.AlignCenter)
-
-            # Card location
-            card_location = QLabel("Indonesia - Jakarta")
-            card_location.setFont(font_manager.get_font("regular", 12))
-            card_layout.addWidget(card_location, alignment=Qt.AlignCenter)
-
-            # Card date
-            card_date = QLabel("01/12/2024")
-            card_date.setFont(font_manager.get_font("light", 10))
-            card_layout.addWidget(card_date, alignment=Qt.AlignCenter)
-
-            card.setLayout(card_layout)
-            journal_cards_layout.addWidget(card)
-
-        # Add journal cards layout to the main layout
-        main_layout.addLayout(journal_cards_layout)
-
-        # Set the main layout for the journal log section
-        self.setLayout(main_layout)
-        
-        # Layout for journal cards
-        journal_cards_layout = QHBoxLayout()
-        journal_cards_layout.setAlignment(Qt.AlignCenter)
-        journal_cards_layout.setSpacing(50)
-
-        for _ in range(6):  # max 6
-            card = QWidget()
-            card.setObjectName("cardJournal")
-            card_layout = QVBoxLayout()
-
-            # Card image
-            card_image_label = QLabel()
-            pixmap = QPixmap("img/img-dummy.png").scaled(120, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            card_image_label.setPixmap(pixmap)
-            card_layout.addWidget(card_image_label, alignment=Qt.AlignCenter)
-
-            # Card title
-            card_title = QLabel("Jurnal")
-            card_title.setFont(font_manager.get_font("bold", 14))
-            card_layout.addWidget(card_title, alignment=Qt.AlignCenter)
-
-            # Card location
-            card_location = QLabel("Indonesia - Jakarta")
-            card_location.setFont(font_manager.get_font("regular", 12))
-            card_layout.addWidget(card_location, alignment=Qt.AlignCenter)
-
-            # Card date
-            card_date = QLabel("01/12/2024")
-            card_date.setFont(font_manager.get_font("light", 10))
-            card_layout.addWidget(card_date, alignment=Qt.AlignCenter)
-
-            card.setLayout(card_layout)
-            journal_cards_layout.addWidget(card)
-
-        # Add journal cards layout to the main layout
-        main_layout.addLayout(journal_cards_layout)
-
         # Set the main layout for the journal log section
         self.setLayout(main_layout)
 
-        # Stylesheet for cards
-        self.setStyleSheet("""
-            QWidget#cardJournal {
-                background-color: white;
-                border: 1px solid #dcdcdc;
-                border-radius: 8px;
-                padding: 10px;
-            }
-        """)
+    def handle_search(self, query):
+        """Handle search action"""
+        result = self.controller.search_journals(query)
+        # Tampilkan hasil pencarian di GUI
+        for journal in result:
+            print(journal)  # Bisa ditampilkan dalam layout, misalnya dengan menambahkan widget baru
+
+    def open_tambah_jurnal_form(self):
+        """Open the Add Journal form"""
+        self.tambah_jurnal_form = TambahJurnalForm()
+        self.tambah_jurnal_form.show()
