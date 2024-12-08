@@ -8,7 +8,7 @@ from src.gui.navbar import Navbar
 from src.gui.home_section import HomeSection
 from src.gui.journal_log_section import JournalLogSection
 from src.gui.bucket_list_section import BucketListSection
-from src.gui.stat_section import StatSection
+#from src.gui.stat_section import StatSection
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self.home_section = HomeSection()
         self.journal_log_section = JournalLogSection()
         self.bucket_list_section = BucketListSection()
-        self.statistic_section = StatSection()
+        #self.statistic_section = StatSection()
         self.location_section = QWidget()
 
         # Set up each section
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.central_widget.addWidget(self.home_section)
         self.central_widget.addWidget(self.journal_log_section)
         self.central_widget.addWidget(self.bucket_list_section)
-        self.central_widget.addWidget(self.statistic_section)
+        #self.central_widget.addWidget(self.statistic_section)
         self.central_widget.addWidget(self.location_section)
 
         # Show home section by default
