@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from models.databaseEntity import DatabaseEntity
-from models.journalEntity import JournalEntity
+from src.models.databaseEntity import DatabaseEntity
+from src.models.journalEntity import JournalEntity
 
 class DatabaseJournalController:
 
