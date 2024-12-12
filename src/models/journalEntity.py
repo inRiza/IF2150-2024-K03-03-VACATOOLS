@@ -1,15 +1,19 @@
 class JournalEntity:
-    def __init__(self, id: int, judul: str, nama_negara: str, nama_kota: str,
-                 tanggal_perjalanan: str, deskripsi_perjalanan: str, image_path: str):
-        self.id = id
-        self.judul = judul
-        self.nama_negara = nama_negara
-        self.nama_kota = nama_kota
-        self.tanggal_perjalanan = tanggal_perjalanan
-        self.deskripsi_perjalanan = deskripsi_perjalanan
+    def __init__(self, title, country, city, date, description, image_path):
+        self.title = title
+        self.country = country
+        self.city = city
+        self.date = date
+        self.description = description
         self.image_path = image_path
 
-    def __repr__(self):
-        return (f"JournalEntity(id={self.id}, judul={self.judul}, nama_negara={self.nama_negara}, "
-                f"nama_kota={self.nama_kota}, tanggal_perjalanan={self.tanggal_perjalanan}, "
-                f"deskripsi_perjalanan={self.deskripsi_perjalanan}, image_path={self.image_path})")
+    def to_dict(self):
+        """Convert the JournalEntry to a dictionary that can be used by the DatabaseController."""
+        return {
+            "title": self.title,
+            "country": self.country,
+            "city": self.city,
+            "date": self.date,
+            "description": self.description,
+            "image_path": self.image_path
+        }
