@@ -98,8 +98,8 @@ class FormBucketPage(Screen):
 
             # Buat jurnal baru menggunakan ViewbucketController
             self.view_controller.validate_input(
-                ['title', 'country', 'city', 'description'],
-                title=title, country=country, city=city, description=description
+                ['title', 'country', 'city'],
+                title=title, country=country, city=city
             )
 
             new_bucket = self.view_controller.create_bucket(

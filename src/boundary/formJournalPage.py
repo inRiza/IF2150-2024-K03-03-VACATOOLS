@@ -123,45 +123,8 @@ class FormJournalPage(Screen):
             self.journal_description_input.text = ""
             self.image_path_input.text = ""  # Reset image path
 
-            # Tampilkan popup dan berpindah ke page lain
-            self.show_success_popup()
-
             print("Journal saved successfully!")
         except ValueError as e:
             print(f"Error: {e}")
         except Exception as e:
             print(f"Unexpected error: {e}")
-
-    def show_success_popup(self):
-        print("Masuk ke fungsi show_success_popup")  # Debug log
-        layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
-        label = Label(text="Journal has been created")
-        close_button = Button(text="OK", size_hint=(1, 0.2))
-
-        layout.add_widget(label)
-        layout.add_widget(close_button)
-
-        popup = Popup(title="Success", content=layout, size_hint=(0.6, 0.4), auto_dismiss=False)
-
-        def on_close(instance):
-            print("Popup ditutup, pindah ke JOURNAL_LOG")  # Debug log
-            popup.dismiss()
-            self.manager.current = "JOURNAL_LOG"  # Pindah ke layar lain
-
-        close_button.bind(on_press=on_close)
-
-        try:
-            popup.open()
-            print("Popup berhasil dibuka")  # Debug log
-        except Exception as e:
-            print(f"Error membuka popup: {e}")  # Jika ada error
-            
-    def reset_form(self):
-        self.journal_title_input.text = ""
-        self.journal_country_input.text = ""
-        self.journal_city_input.text = ""
-        self.journal_date_input.text = ""
-        self.journal_description_input.text = ""
-        self.image_path_input.text = ""
-
-
