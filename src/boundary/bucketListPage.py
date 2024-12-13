@@ -1,4 +1,5 @@
 from kivy.uix.screenmanager import Screen
+from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -6,11 +7,16 @@ from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from img.font.fontManager import FontManager  # Import FontManager untuk Poppins
+from ..controller.databaseBucketListController import DatabaseBucketListController
 
 class BucketListPage(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # Initialiaze DatabasebucketController and retrieve bucket entries
+        self.db_controller = DatabaseBucketListController("database.db")
+        self.bucket_entries = self.db_controller.get_all_bucket_entries()
+        
         # Add background color using canvas.before
         with self.canvas.before:
             Color(1, 1, 1, 1)  # White color (RGBA)
@@ -35,20 +41,20 @@ class BucketListPage(Screen):
         )
         title_label.pos = (40, self.height * 6)
 
-        # "Create a Journal" button below the title
+        # "Create a bucket" button below the title
         create_button = self.create_button("Create a Bucket List")
         create_button.pos = (20, self.height * 5.5)
         
         create_button.bind(on_press=self.on_create_button_press)
 
-        # Create the journal container below the button
-        journal_container = self.create_bucket_container()
-        journal_container.pos = (20, self.height * 3.8)
+        # Create the bucket container below the button
+        bucket_container = self.create_bucket_container()
+        bucket_container.pos = (20, self.height * 3.8)
 
-        # Add title, button, and the journal container to the layout
+        # Add title, button, and the bucket container to the layout
         layout.add_widget(title_label)
         layout.add_widget(create_button)
-        layout.add_widget(journal_container)
+        layout.add_widget(bucket_container)
 
         # Add layout to the screen
         self.add_widget(layout)
@@ -89,7 +95,7 @@ class BucketListPage(Screen):
         instance.border_rect.pos = instance.pos
 
     def create_bucket_container(self):
-        """Create a container with a scrollable list of journals."""
+        """Create a container with a scrollable list of buckets."""
         # Create container with specific size and make sure it's centered
         container = FloatLayout(size_hint=(None, None), size=(1100, 450))  # Fixed size
         container.y = self.height * 0.6
@@ -100,39 +106,33 @@ class BucketListPage(Screen):
             Color(0.9, 0.9, 0.9, 0.6)  # Light grey background color
             RoundedRectangle(size=container.size, pos=container.pos, radius=[25])
 
-        # ScrollView for journal list
+        # ScrollView for bucket list
         scroll_view = ScrollView(size_hint=(1, None), height=350)
         scroll_view.y = self.height * 1.5
         scroll_view.x = self.width * 0.2
         container.add_widget(scroll_view)
 
-        # BoxLayout for the journal list inside ScrollView
+        # BoxLayout for the bucket list inside ScrollView
         bucket_list_container = BoxLayout(
             orientation='vertical',  # Arrange labels vertically
             size_hint_y=None,
             height=270  # Adjust as needed
         )
 
-        # Sample data (journals)
-        buckets = [
-            {"title": "Trip to Paris", "country": "France", "city": "Paris"},
-            {"title": "Exploring Tokyo", "country": "Japan", "city": "Tokyo"},
-            {"title": "New York Adventure", "country": "USA", "city": "New York"},
-            {"title": "Rome Diaries", "country": "Italy", "city": "Rome"},
-        ]
-
-        # Add journal entries
-        for bucket in buckets:
-            # Horizontal BoxLayout for each journal entry
+        # Sample data (buckets)
+        
+        for bucket in self.bucket_entries:
+        
+             # Horizontal BoxLayout for each bucket entry
             bucket_entry_layout = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
-                spacing = 10,
+                spacing=10,
                 pos_hint={'x': -0.05},
                 height=60  # Fixed height for each entry
             )
 
-            # Journal details label
+            # bucket details label
             bucket_label = Label(
                 text=f"{bucket['title']} - {bucket['city']}, {bucket['country']}",
                 size_hint_x=0.7,  # Take 70% of the width
@@ -150,7 +150,7 @@ class BucketListPage(Screen):
                 font_size='12sp',
                 font_name=FontManager.get_font_name("Regular"),
             )
-            view_button.bind(on_release=lambda instance, j=bucket: self.on_view_pressed(j))
+            view_button.bind(on_release=lambda instance, b=bucket: App.get_running_app().open_bucket_view(b['id']))
 
             # Delete button
             delete_button = Button(
@@ -161,29 +161,30 @@ class BucketListPage(Screen):
                 font_size='12sp',
                 font_name=FontManager.get_font_name("Regular"),
             )
-            delete_button.bind(on_release=lambda instance, j=bucket: self.on_delete_pressed(j))
+            delete_button.bind(on_release=lambda instance, b=bucket: self.on_delete_pressed(b))
 
             # Add label and buttons to the entry layout
             bucket_entry_layout.add_widget(bucket_label)
             bucket_entry_layout.add_widget(view_button)
             bucket_entry_layout.add_widget(delete_button)
 
-            # Add the journal entry layout to the list container
+            # Add the bucket entry layout to the list container
             bucket_list_container.add_widget(bucket_entry_layout)
 
-        # Add the journal list container to the ScrollView
+        # Add the bucket list container to the ScrollView
         scroll_view.add_widget(bucket_list_container)
 
         return container
 
     def on_view_pressed(self, bucket):
-        """Handle the view button press."""
-        print(f"Viewing journal: {bucket['title']}")
+        bucket_id = bucket['id']
+        self.manager.current = "VIEW_BUCKET"
+        self.manager.get_screen("").__init__(bucket_id)
 
     def on_delete_pressed(self, bucket):
         """Handle the delete button press."""
-        print(f"Deleting journal: {bucket['title']}")
+        print(f"Deleting bucket: {bucket['title']}")
         
     def on_create_button_press(self, instance):
-        """Navigate to the FormJournalPage when the button is pressed."""
+        """Navigate to the FormbucketPage when the button is pressed."""
         self.manager.current = "FORM_BUCKET"
