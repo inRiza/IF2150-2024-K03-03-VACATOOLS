@@ -11,6 +11,7 @@ from src.boundary.databasePage import DatabasePage
 from src.boundary.formJournalPage import FormJournalPage  
 from src.boundary.formBucketPage import FormBucketPage 
 from src.controller.databaseStatisticController import DatabaseStatisticController  
+from src.database.databaseEntity import DatabaseEntity  # Tambahkan impor DatabaseEntity
 
 class MainApp(App):
     def build(self):
@@ -18,6 +19,7 @@ class MainApp(App):
 
         # Membuat instance db_controller (DatabaseStatisticController)
         db_controller = DatabaseStatisticController("database.db")
+        db_entity = DatabaseEntity("database.db")  # Membuat instance DatabaseEntity
 
         # Screen manager to handle navigation
         screen_manager = ScreenManager()
@@ -30,7 +32,8 @@ class MainApp(App):
         # Menambahkan StatisticPage dengan db_controller
         screen_manager.add_widget(StatisticPage(name='STATISTIC', db_controller=db_controller))
         
-        screen_manager.add_widget(DatabasePage(name='LOCATION'))
+        # Menambahkan DatabasePage dengan db_entity
+        screen_manager.add_widget(DatabasePage(name='LOCATION', db_entity=db_entity))
 
         # Add white background to the screen manager
         with screen_manager.canvas.before:
