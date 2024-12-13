@@ -1,4 +1,5 @@
 from kivy.uix.screenmanager import Screen
+from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -6,10 +7,15 @@ from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from img.font.fontManager import FontManager  # Import FontManager untuk Poppins
+from ..controller.databaseJournalController import DatabaseJournalController  # Make sure to import the controller
 
 class JournalPage(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        # Initialize DatabaseJournalController and retrieve journal entries
+        self.db_controller = DatabaseJournalController("database.db")
+        self.journal_entries = self.db_controller.get_all_journal_entries()
 
         # Add background color using canvas.before
         with self.canvas.before:
@@ -110,21 +116,13 @@ class JournalPage(Screen):
             height=270  # Adjust as needed
         )
 
-        # Sample data (journals)
-        journals = [
-            {"title": "Trip to Paris", "country": "France", "city": "Paris", "date": "2024-03-12"},
-            {"title": "Exploring Tokyo", "country": "Japan", "city": "Tokyo", "date": "2024-05-25"},
-            {"title": "New York Adventure", "country": "USA", "city": "New York", "date": "2024-06-15"},
-            {"title": "Rome Diaries", "country": "Italy", "city": "Rome", "date": "2024-07-09"},
-        ]
-
-        # Add journal entries
-        for journal in journals:
+        # Add journal entries from the database
+        for journal in self.journal_entries:
             # Horizontal BoxLayout for each journal entry
             journal_entry_layout = BoxLayout(
                 orientation='horizontal',
                 size_hint_y=None,
-                spacing = 10,
+                spacing=10,
                 pos_hint={'x': -0.05},
                 height=60  # Fixed height for each entry
             )
@@ -147,7 +145,7 @@ class JournalPage(Screen):
                 font_size='12sp',
                 font_name=FontManager.get_font_name("Regular"),
             )
-            view_button.bind(on_release=lambda instance, j=journal: self.on_view_pressed(j))
+            view_button.bind(on_release=lambda instance, j=journal: App.get_running_app().open_journal_view(j['id']))
 
             # Delete button
             delete_button = Button(
@@ -174,13 +172,14 @@ class JournalPage(Screen):
         return container
 
     def on_view_pressed(self, journal):
-        """Handle the view button press."""
-        print(f"Viewing journal: {journal['title']}")
+        journal_id = journal['id']
+        self.manager.current = "VIEW_JOURNAL"
+        self.manager.get_screen("").__init__(journal_id)
 
     def on_delete_pressed(self, journal):
         """Handle the delete button press."""
         print(f"Deleting journal: {journal['title']}")
-        
+
     def on_create_button_press(self, instance):
         """Navigate to the FormJournalPage when the button is pressed."""
         self.manager.current = "FORM_JOURNAL"
