@@ -53,12 +53,10 @@ class JournalPage(Screen):
         self.add_widget(layout)
 
     def _update_bg(self, *args):
-        """Update the background size and position."""
         self.bg_rect.size = self.size
         self.bg_rect.pos = self.pos
 
     def create_button(self, text):
-        """Create a button with a transparent fill and visible rounded border."""
         button = Button(
             text=text,
             size_hint=(0.17, None),  # 60% width, fixed height
