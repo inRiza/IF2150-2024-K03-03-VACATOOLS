@@ -155,4 +155,13 @@ class FormJournalPage(Screen):
             print("Popup berhasil dibuka")  # Debug log
         except Exception as e:
             print(f"Error membuka popup: {e}")  # Jika ada error
+            
+    def reset_form(self):
+        self.journal_title_input.text = ""
+        self.journal_country_input.text = ""
+        self.journal_city_input.text = ""
+        self.journal_date_input.text = ""
+        self.journal_description_input.text = ""
+        self.image_path_input.text = ""
+
 
