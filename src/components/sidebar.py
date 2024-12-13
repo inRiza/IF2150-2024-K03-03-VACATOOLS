@@ -50,7 +50,7 @@ class Sidebar(BoxLayout):
             {"text": "Home", "screen_name": "HOME"},
             {"text": "Journal Log", "screen_name": "JOURNAL_LOG"},
             {"text": "Bucket List", "screen_name": "BUCKET_LIST"},
-            {"text": "Statistics", "screen_name": "STATISTIC"},
+            {"text": "Statistic", "screen_name": "STATISTIC"},
             {"text": "Location", "screen_name": "LOCATION"},
         ]
 
