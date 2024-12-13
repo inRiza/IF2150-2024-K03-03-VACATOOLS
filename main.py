@@ -6,14 +6,18 @@ from src.components.sidebar import Sidebar
 from src.boundary.homePage import HomePage
 from src.boundary.journalPage import JournalPage
 from src.boundary.bucketListPage import BucketListPage
-from src.boundary.page3 import Page3
-from src.boundary.page4 import Page4
-from src.boundary.formJournalPage import FormJournalPage  # Import FormJournalPage
-from src.boundary.formBucketPage import FormBucketPage  # Import FormJournalPage
+from src.boundary.statisticPage import StatisticPage
+from src.boundary.databasePage import DatabasePage
+from src.boundary.formJournalPage import FormJournalPage  
+from src.boundary.formBucketPage import FormBucketPage 
+from src.controller.databaseStatisticController import DatabaseStatisticController  
 
 class MainApp(App):
     def build(self):
         root = BoxLayout(orientation='horizontal')
+
+        # Membuat instance db_controller (DatabaseStatisticController)
+        db_controller = DatabaseStatisticController("database.db")
 
         # Screen manager to handle navigation
         screen_manager = ScreenManager()
@@ -22,8 +26,11 @@ class MainApp(App):
         screen_manager.add_widget(FormJournalPage(name='FORM_JOURNAL'))  
         screen_manager.add_widget(FormBucketPage(name='FORM_BUCKET'))  
         screen_manager.add_widget(BucketListPage(name='BUCKET_LIST'))
-        screen_manager.add_widget(Page3(name='STATISTIC'))
-        screen_manager.add_widget(Page4(name='LOCATION'))
+        
+        # Menambahkan StatisticPage dengan db_controller
+        screen_manager.add_widget(StatisticPage(name='STATISTIC', db_controller=db_controller))
+        
+        screen_manager.add_widget(DatabasePage(name='LOCATION'))
 
         # Add white background to the screen manager
         with screen_manager.canvas.before:
