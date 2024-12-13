@@ -2,7 +2,7 @@ from ..database.databaseEntity import DatabaseEntity
 from ..models.bucketEntity import BucketEntity
 from pathlib import Path
 
-class DatabasebucketController:
+class DatabaseBucketListController:
     def __init__(self, db_name: str):
         # Menentukan folder database yang sejajar dengan folder controller
         db_folder = Path(__file__).parent.parent / "database"
@@ -36,6 +36,18 @@ class DatabasebucketController:
         return self.db.getData(
             "BUCKET_LIST", "id", "title", "country", "city", "description"
         )
+        
+    def get_bucket_entry_by_id(self, bucket_id: int):
+        """
+        Mengambil entri bucket berdasarkan ID.
+        """
+        query = f"SELECT * FROM BUCKET_LIST WHERE id = {bucket_id}"
+        result = self.db.executeQuery(query)
+        
+        if result:
+            columns = [desc[0] for desc in self.db.cursor.description]  # Ambil nama kolom dari hasil query
+            return dict(zip(columns, result[0]))  # Mengubah hasil menjadi dictionary dengan nama kolom sebagai key
+        return None  # Jika tidak ada hasil
 
     def close_connection(self):
         """

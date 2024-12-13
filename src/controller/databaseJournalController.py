@@ -35,8 +35,22 @@ class DatabaseJournalController:
         Mengambil semua entri jurnal dari database.
         """
         return self.db.getData(
-            "JOURNAL_LOG", "id", "title", "country", "city", "date", "description", "image_path"
+            "JOURNAL_LOG", "id", "title", "country", "city", "date", "description"
         )
+        # "image_path"
+    
+    def get_journal_entry_by_id(self, journal_id: int):
+        """
+        Mengambil entri jurnal berdasarkan ID.
+        """
+        query = f"SELECT * FROM JOURNAL_LOG WHERE id = {journal_id}"
+        result = self.db.executeQuery(query)
+        
+        if result:
+            columns = [desc[0] for desc in self.db.cursor.description]  # Ambil nama kolom dari hasil query
+            return dict(zip(columns, result[0]))  # Mengubah hasil menjadi dictionary dengan nama kolom sebagai key
+        return None  # Jika tidak ada hasil
+
 
     def close_connection(self):
         """
