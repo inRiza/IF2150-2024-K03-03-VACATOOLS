@@ -6,14 +6,14 @@ from kivy.uix.button import Button
 # from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.popup import Popup
 from ..controller.viewBucketListController import ViewBucketListController
-from ..controller.databaseBucketListController import DatabasebucketController
+from ..controller.databaseBucketListController import DatabaseBucketListController
 
 class FormBucketPage(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # Inisialisasi DatabasebucketController dan ViewbucketController
-        self.db_bucket_controller = DatabasebucketController(db_name="database.db")
+        self.db_bucket_controller =DatabaseBucketListController(db_name="database.db")
         self.view_controller = ViewBucketListController(db_controller=self.db_bucket_controller)
 
         # Layout untuk form

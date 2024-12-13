@@ -50,9 +50,9 @@ class FormJournalPage(Screen):
         self.layout.add_widget(self.image_path_input)
 
         # Tombol untuk membuka file chooser
-        self.select_image_button = Button(text="Choose Image")
-        self.select_image_button.bind(on_press=self.select_image)
-        self.layout.add_widget(self.select_image_button)
+        # self.select_image_button = Button(text="Choose Image")
+        # self.select_image_button.bind(on_press=self.select_image)
+        # self.layout.add_widget(self.select_image_button)
 
         # Tombol Save
         self.save_button = Button(text="Save Journal")
@@ -61,27 +61,27 @@ class FormJournalPage(Screen):
 
         self.add_widget(self.layout)
 
-    def select_image(self, instance):
-        """
-        Fungsi untuk membuka file chooser dan memilih gambar.
-        """
-        file_chooser = FileChooserIconView()
-        file_chooser.filters = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.bmp']  # Menambahkan filter gambar
-        file_chooser.bind(on_selection=self.on_file_select)
+    # def select_image(self, instance):
+    #     """
+    #     Fungsi untuk membuka file chooser dan memilih gambar.
+    #     """
+    #     file_chooser = FileChooserIconView()
+    #     file_chooser.filters = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.bmp']  # Menambahkan filter gambar
+    #     file_chooser.bind(on_selection=self.on_file_select)
 
-        # Buat popup dan tampilkan file chooser di dalamnya
-        popup = Popup(title="Select Image", content=file_chooser, size_hint=(0.9, 0.9))
-        popup.open()
+    #     # Buat popup dan tampilkan file chooser di dalamnya
+    #     popup = Popup(title="Select Image", content=file_chooser, size_hint=(0.9, 0.9))
+    #     popup.open()
 
-    def on_file_select(self, instance, selection):
-        """
-        Menangani pemilihan file gambar.
-        """
-        if selection:
-            self.image_path_input.text = selection[0]  # Ambil path file yang dipilih
-            instance.parent.parent.dismiss()  # Menutup popup setelah file dipilih
-        else:
-            self.image_path_input.text = ""
+    # def on_file_select(self, instance, selection):
+    #     """
+    #     Menangani pemilihan file gambar.
+    #     """
+    #     if selection:
+    #         self.image_path_input.text = selection[0]  # Ambil path file yang dipilih
+    #         instance.parent.parent.dismiss()  # Menutup popup setelah file dipilih
+    #     else:
+    #         self.image_path_input.text = ""
 
     def save_journal(self, instance):
         """
@@ -94,7 +94,7 @@ class FormJournalPage(Screen):
             city = self.journal_city_input.text.strip()
             date = self.journal_date_input.text.strip()
             description = self.journal_description_input.text.strip() or None
-            image_path = self.image_path_input.text.strip() or None  # Menambahkan image_path
+            #image_path = self.image_path_input.text.strip() or None  # Menambahkan image_path
 
             # Validasi input menggunakan ViewJournalController
             self.view_controller.validate_input(
@@ -109,8 +109,8 @@ class FormJournalPage(Screen):
                 city=city,
                 date=date,
                 description=description,
-                image_path=image_path  # Menambahkan image_path
-            )
+                # iage_path=image_path  # Menambahkan image_path
+            )  
 
             # Simpan jurnal ke database menggunakan DatabaseJournalController
             self.db_journal_controller.save_journal_entry(new_journal)
@@ -121,7 +121,7 @@ class FormJournalPage(Screen):
             self.journal_city_input.text = ""
             self.journal_date_input.text = ""
             self.journal_description_input.text = ""
-            self.image_path_input.text = ""  # Reset image path
+            # self.image_path_input.text = ""  # Reset image path
 
             print("Journal saved successfully!")
         except ValueError as e:
