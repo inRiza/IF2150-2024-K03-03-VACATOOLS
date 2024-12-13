@@ -27,7 +27,7 @@ class DatabaseEntity:
 
         # Bucket List Table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS BUCKET_LIST (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             country TEXT NOT NULL,
             city TEXT NOT NULL,
@@ -37,11 +37,16 @@ class DatabaseEntity:
 
         # Statistics Table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS STATISTIC (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             country TEXT NOT NULL,
             city TEXT NOT NULL,
             count INTEGER NOT NULL,
             FOREIGN KEY (id) REFERENCES journal_log (id)
+        );""")
+        
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS LOCATION (
+            country TEXT NOT NULL,
+            city TEXT NOT NULL
         );""")
 
     def addData(self, namaTabel: str, **data):
