@@ -17,7 +17,7 @@ class ViewJournalController:
             if not kwargs.get(field):
                 raise ValueError(f"Field '{field}' harus diisi.")
 
-    def create_journal(self, title, country, city, date, description=None, image_path=None):
+    def create_journal(self, title, country, city, date, description=None):   #image_path=None
         """
         Create a new journal and add it to the list.
         """
@@ -30,7 +30,7 @@ class ViewJournalController:
             city=city,
             date=date,
             description=description,
-            image_path=image_path
+            # image_path=image_path
         )
         
         if not new_journal:
@@ -81,7 +81,7 @@ class ViewJournalController:
         Update a journal's attributes by its ID.
         Supported attributes: title, country, city, date, description, image_path.
         """
-        valid_attributes = {"title", "country", "city", "date", "description", "image_path"}
+        valid_attributes = {"title", "country", "city", "date", "description"} 
         for journal in self.journals:
             if journal.id == journal_id:
                 for key, value in updates.items():
@@ -92,3 +92,5 @@ class ViewJournalController:
                 logging.info(f"Journal with ID {journal_id} updated: {journal}")
                 return
         raise KeyError(f"Journal dengan ID {journal_id} tidak ditemukan.")
+
+        # image_path
