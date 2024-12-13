@@ -4,20 +4,20 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.graphics import Color, RoundedRectangle
 from img.font.fontManager import FontManager
-from ..controller.databaseJournalController import DatabaseJournalController
+from ..controller.databaseBucketListController import DatabaseBucketListController
 
-class JournalViewPage(Screen):
-    def __init__(self, journal_id, **kwargs):
+class BucketViewPage(Screen):
+    def __init__(self, bucket_id, **kwargs):
         super().__init__(**kwargs)
         
-        # Initialize the database controller and fetch journal details by ID
-        self.db_controller = DatabaseJournalController("database.db")
-        self.journal_details = self.db_controller.get_journal_entry_by_id(journal_id)
+        # Initialize the database controller and fetch bucket details by ID
+        self.db_controller = DatabaseBucketListController("database.db")
+        self.bucket_details = self.db_controller.get_bucket_entry_by_id(bucket_id)
         
-        self.journal_id = journal_id if journal_id is not None else 'default_value'
+        self.buc = bucket_id if bucket_id is not None else 'default_value'
 
-        if not self.journal_details:
-            raise ValueError(f"No journal found with ID {journal_id}")
+        if not self.bucket_details:
+            raise ValueError(f"No bucket found with ID {bucket_id}")
 
         # Add background color using canvas.before
         with self.canvas.before:
@@ -32,7 +32,7 @@ class JournalViewPage(Screen):
 
         # Title label
         title_label = Label(
-            text="Journal Details",
+            text="bucket Details",
             color=(0, 0, 0, 1),
             font_size='24sp',
             font_name=FontManager.get_font_name("Bold"),
@@ -42,12 +42,12 @@ class JournalViewPage(Screen):
         )
         layout.add_widget(title_label)
 
-        # Display journal details
-        self.add_detail_label(layout, "Title:", self.journal_details['title'], 0.75)
-        self.add_detail_label(layout, "Country:", self.journal_details['country'], 0.65)
-        self.add_detail_label(layout, "City:", self.journal_details['city'], 0.55)
-        self.add_detail_label(layout, "Date:", self.journal_details['date'], 0.45)
-        self.add_detail_label(layout, "Description:", self.journal_details['description'], 0.35, multiline=True)
+        # Display bucket details
+        self.add_detail_label(layout, "Title:", self.bucket_details['title'], 0.75)
+        self.add_detail_label(layout, "Country:", self.bucket_details['country'], 0.65)
+        self.add_detail_label(layout, "City:", self.bucket_details['city'], 0.55)
+        # self.add_detail_label(layout, "Date:", self.bucket_details['date'], 0.45)
+        self.add_detail_label(layout, "Description:", self.bucket_details['description'], 0.35, multiline=True)
 
         # Back button
         back_button = Button(
@@ -99,5 +99,5 @@ class JournalViewPage(Screen):
         layout.add_widget(value_label)
 
     def on_back_button_press(self, instance):
-        """Handle the back button press to navigate back to the journal list."""
-        self.manager.current = "JOURNAL_LOG"
+        """Handle the back button press to navigate back to the bucket list."""
+        self.manager.current = "BUCKET_LIST"
