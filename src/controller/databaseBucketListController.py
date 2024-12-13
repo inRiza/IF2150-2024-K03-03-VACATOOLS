@@ -25,7 +25,7 @@ class DatabasebucketController:
         Mengambil daftar country dan city dari database.
         """
         # Menggunakan query langsung dari DatabaseEntity
-        query = "SELECT DISTINCT Country, City FROM BUCKET_LIST"  # Ganti dengan nama tabel Anda
+        query = "SELECT DISTINCT Country, City FROM LOCATION"  # Ganti dengan nama tabel Anda
         result = self.db.executeQuery(query)  # Pastikan DatabaseEntity memiliki metode executeQuery
         return result
 

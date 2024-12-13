@@ -45,7 +45,6 @@ class ViewJournalController:
 
         return new_journal
 
-
     def get_journals(self):
         """
         Get all journals.
