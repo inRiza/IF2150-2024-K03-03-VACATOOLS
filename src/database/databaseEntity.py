@@ -22,7 +22,7 @@ class DatabaseEntity:
             city TEXT NOT NULL,
             date TEXT NOT NULL,
             description TEXT,
-            image_path TEXT NOT NULL
+            image_path TEXT
         );""")
 
         # Bucket List Table
@@ -59,9 +59,22 @@ class DatabaseEntity:
         columns = [desc[0] for desc in self.cursor.description]
         return [dict(zip(columns, row)) for row in rows]
 
+    def executeQuery(self, query: str):
+        """
+        Menjalankan query SQL mentah.
+        :param query: Query SQL sebagai string.
+        :return: Hasil dari query.
+        """
+        try:
+            self.cursor.execute(query)
+            return self.cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"Error executing query: {e}")
+            return None
+
     def close(self):
         """Close the database connection."""
         if self.conn:
             self.conn.close()
             self.conn = None
-            print("Database connection succesfully disconnected.")
+            print("Database connection successfully disconnected.")
