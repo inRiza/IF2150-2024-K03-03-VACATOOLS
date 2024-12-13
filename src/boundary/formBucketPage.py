@@ -1,144 +1,129 @@
 from kivy.uix.screenmanager import Screen
-from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.uix.spinner import Spinner
 # from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.popup import Popup
-from kivy.graphics import Color, Rectangle
-from img.font.fontManager import FontManager
-
+from ..controller.viewBucketListController import ViewBucketListController
+from ..controller.databaseBucketListController import DatabasebucketController
 
 class FormBucketPage(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Add background color using canvas.before
-        with self.canvas.before:
-            Color(1, 1, 1, 1)  # White color (RGBA)
-            self.bg_rect = Rectangle(size=self.size, pos=self.pos)
+        # Inisialisasi DatabasebucketController dan ViewbucketController
+        self.db_bucket_controller = DatabasebucketController(db_name="database.db")
+        self.view_controller = ViewBucketListController(db_controller=self.db_bucket_controller)
 
-        # Bind size and position changes to update the background
-        self.bind(size=self._update_bg, pos=self._update_bg)
+        # Layout untuk form
+        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
 
-        # Main layout using FloatLayout for fixed positioning
-        layout = FloatLayout(size=self.size)
+        # Input untuk title
+        self.bucket_title_input = TextInput(hint_text="Enter bucket Title", multiline=False)
+        self.layout.add_widget(Label(text="bucket Title:"))
+        self.layout.add_widget(self.bucket_title_input)
 
-        # Title
-        title_label = Label(
-            text="Create a New bucket",
-            color=(0, 0, 0, 1),
-            font_size='24sp',
-            font_name=FontManager.get_font_name("Regular"),  # Poppins Regular font
-            bold=True,
-            size_hint=(None, None),
-            size=(300, 40)
-        )
-        title_label.pos = (20, self.height * 7)
+        # Input untuk country
+        self.bucket_country_input = TextInput(hint_text="Enter Country", multiline=False)
+        self.layout.add_widget(Label(text="Country:"))
+        self.layout.add_widget(self.bucket_country_input)
 
-        # bucket Title Input
-        bucket_title_input = TextInput(
-            hint_text="Enter bucket Title (Max 250 characters)",
-            size_hint=(0.8, None),
-            height=40,
-            font_name=FontManager.get_font_name("Regular"),
-        )
-        bucket_title_input.pos = (self.width * 0.1, self.height * 6.5)
+        # Input untuk city
+        self.bucket_city_input = TextInput(hint_text="Enter City", multiline=False)
+        self.layout.add_widget(Label(text="City:"))
+        self.layout.add_widget(self.bucket_city_input)
 
-        # Country Spinner (dropdown)
-        country_spinner = Spinner(
-            text="Select Country",
-            values=("USA", "France", "Japan", "Italy"),
-            size_hint=(None, None),
-            size=(200, 40),
-            font_name=FontManager.get_font_name("Regular"),
-        )
-        country_spinner.pos = (self.width * 0.1, self.height * 5.8)
+        # # Input untuk date
+        # self.bucket_date_input = TextInput(hint_text="Enter Date (YYYY-MM-DD)", multiline=False)
+        # self.layout.add_widget(Label(text="Date:"))
+        # self.layout.add_widget(self.bucket_date_input)
 
-        # City Spinner (dropdown)
-        city_spinner = Spinner(
-            text="Select City",
-            values=("New York", "Paris", "Tokyo", "Rome"),
-            size_hint=(None, None),
-            size=(200, 40),
-            font_name=FontManager.get_font_name("Regular"),
-        )
-        city_spinner.pos = (self.width * 0.1, self.height * 5.2)
+        # Input untuk description (opsional)
+        self.bucket_description_input = TextInput(hint_text="Enter Description (Optional)", multiline=True)
+        self.layout.add_widget(Label(text="Description:"))
+        self.layout.add_widget(self.bucket_description_input)
 
-        # Description Input
-        description_input = TextInput(
-            hint_text="Enter bucket Description (Max 800 words)",
-            size_hint=(0.8, None),
-            height=200,
-            multiline=True,
-            font_name=FontManager.get_font_name("Regular"),
-        )
-        description_input.pos = (self.width * 0.1, self.height * 2.5)
+        # # Input untuk memilih image (opsional)
+        # self.image_path_input = TextInput(hint_text="Select Image (Optional)", multiline=False, readonly=True)
+        # self.layout.add_widget(Label(text="Image Path:"))
+        # self.layout.add_widget(self.image_path_input)
 
-        # # Image Selection Button
-        # self.image_button = Button(
-        #     text="Select Image",
-        #     size_hint=(None, None),
-        #     size=(200, 40),
-        #     background_color=(0.3, 0.6, 0.9, 1),
-        #     color=(1, 1, 1, 1),
-        #     font_size='14sp',
-        #     font_name=FontManager.get_font_name("Regular"),
-        # )
-        # self.image_button.pos = (self.width * 0.1, self.height * 1.5)
-        # self.image_button.bind(on_release=self.on_select_image)
+        # # Tombol untuk membuka file chooser
+        # self.select_image_button = Button(text="Choose Image")
+        # self.select_image_button.bind(on_press=self.select_image)
+        # self.layout.add_widget(self.select_image_button)
 
-        # Save Button
-        save_button = Button(
-            text="Save bucket",
-            size_hint=(None, None),
-            size=(200, 40),
-            background_color=(0.3, 0.6, 0.9, 1),
-            color=(1, 1, 1, 1),
-            font_size='14sp',
-            font_name=FontManager.get_font_name("Regular"),
-        )
-        save_button.pos = (self.width * 0.1, self.height * 0.5)
+        # Tombol Save
+        self.save_button = Button(text="Save bucket")
+        self.save_button.bind(on_press=self.save_bucket)  # Hubungkan tombol ke fungsi
+        self.layout.add_widget(self.save_button)
 
-        # Add all widgets to the layout
-        layout.add_widget(title_label)
-        layout.add_widget(bucket_title_input)
-        layout.add_widget(country_spinner)
-        layout.add_widget(city_spinner)
-        layout.add_widget(description_input)
-        # layout.add_widget(self.image_button)
-        layout.add_widget(save_button)
+        self.add_widget(self.layout)
 
-        # Add layout to the screen
-        self.add_widget(layout)
+    # def select_image(self, instance):
+    #     """
+    #     Fungsi untuk membuka file chooser dan memilih gambar.
+    #     """
+    #     file_chooser = FileChooserIconView()
+    #     file_chooser.filters = ['*.png', '*.jpg', '*.jpeg', '*.gif', '*.bmp']  # Menambahkan filter gambar
+    #     file_chooser.bind(on_selection=self.on_file_select)
 
-    def _update_bg(self, *args):
-        """Update the background size and position."""
-        self.bg_rect.size = self.size
-        self.bg_rect.pos = self.pos
-
-    # def on_select_image(self, instance):
-    #     """Handle image selection."""
-    #     # Create the file chooser without the 'title' property
-    #     filechooser = FileChooserIconView(filters=["*.jpg", "*.png"], multiselect=False)
-    #     filechooser.bind(on_submit=self.on_image_selected)
-
-    #     # Create a Popup for the FileChooser with a title in the Popup, not the FileChooser
-    #     popup = Popup(
-    #         title="Choose an Image",
-    #         content=filechooser,
-    #         size_hint=(0.8, 0.8)
-    #     )
+    #     # Buat popup dan tampilkan file chooser di dalamnya
+    #     popup = Popup(title="Select Image", content=file_chooser, size_hint=(0.9, 0.9))
     #     popup.open()
 
-    # def on_image_selected(self, filechooser, selection, *args):
-    #     """Handle the file selected from the file chooser."""
+    # def on_file_select(self, instance, selection):
+    #     """
+    #     Menangani pemilihan file gambar.
+    #     """
     #     if selection:
-    #         selected_file = selection[0]  # Get the file path
-    #         self.image_button.text = f"Selected: {selected_file.split('/')[-1]}"  # Update button text with the selected image filename
-
-    #         # Optionally, you can store the file path if needed
-    #         self.selected_image_path = selected_file
+    #         self.image_path_input.text = selection[0]  # Ambil path file yang dipilih
+    #         instance.parent.parent.dismiss()  # Menutup popup setelah file dipilih
     #     else:
-    #         self.image_button.text = "No file selected"
+    #         self.image_path_input.text = ""
+
+    def save_bucket(self, instance):
+        """
+        Simpan jurnal baru menggunakan ViewbucketController dan DatabasebucketController.
+        """
+        try:
+            # Ambil input dari form
+            title = self.bucket_title_input.text.strip()
+            country = self.bucket_country_input.text.strip()
+            city = self.bucket_city_input.text.strip()
+            # date = self.bucket_date_input.text.strip()
+            description = self.bucket_description_input.text.strip() or None
+            # image_path = self.image_path_input.text.strip() or None  # Menambahkan image_path
+
+            # Buat jurnal baru menggunakan ViewbucketController
+            self.view_controller.validate_input(
+                ['title', 'country', 'city', 'description'],
+                title=title, country=country, city=city, description=description
+            )
+
+            new_bucket = self.view_controller.create_bucket(
+                title=title,
+                country=country,
+                city=city,
+                # date=date,
+                description=description
+                # image_path=image_path  # Menambahkan image_path
+            )
+
+            # Simpan jurnal ke database menggunakan DatabasebucketController
+            self.db_bucket_controller.save_bucket_entry(new_bucket)
+
+            # Reset form setelah berhasil menyimpan
+            self.bucket_title_input.text = ""
+            self.bucket_country_input.text = ""
+            self.bucket_city_input.text = ""
+            # self.bucket_date_input.text = ""
+            self.bucket_description_input.text = ""
+            # self.image_path_input.text = ""  # Reset image path
+
+            print("bucket saved successfully!")
+        except ValueError as e:
+            print(f"Error: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
