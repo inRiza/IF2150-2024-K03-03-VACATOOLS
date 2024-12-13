@@ -17,8 +17,10 @@ class JournalEntity:
             "city": self.city,
             "date": self.date,
             "description": self.description,
-            "image_path": self.image_path,
+            # "image_path": self.image_path,
         }
 
     def __str__(self):
-        return f"JournalEntity(id={self.id}, title={self.title}, country={self.country}, city={self.city}, date={self.date}, description={self.description}, image_path={self.image_path})"
+        return f"JournalEntity(id={self.id}, title={self.title}, country={self.country}, city={self.city}, date={self.date}, description={self.description})"
+
+# image_path={self.image_path} -- kalau mau pake image
