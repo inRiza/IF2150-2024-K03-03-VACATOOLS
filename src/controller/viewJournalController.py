@@ -32,12 +32,19 @@ class ViewJournalController:
             description=description,
             image_path=image_path
         )
+        
+        if not new_journal:
+            raise ValueError("Failed to create journal.")
+        
         self.journals.append(new_journal)
         self.next_id += 1
         logging.info(f"Journal created: {new_journal}")
         
         # Kirim entitas ke controller database untuk disimpan
         self.db_controller.save_journal_entry(new_journal)
+
+        return new_journal
+
 
     def get_journals(self):
         """
