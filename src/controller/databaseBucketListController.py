@@ -48,6 +48,14 @@ class DatabaseBucketListController:
             columns = [desc[0] for desc in self.db.cursor.description]  # Ambil nama kolom dari hasil query
             return dict(zip(columns, result[0]))  # Mengubah hasil menjadi dictionary dengan nama kolom sebagai key
         return None  # Jika tidak ada hasil
+    
+    def delete_bucket_by_id(self, bucket_id: int):
+        """
+        Menghapus entri jurnal dari database berdasarkan ID.
+        """
+        query = f"DELETE FROM BUCKET_LIST WHERE id = {bucket_id}"
+        self.db.executeQuery(query)
+        print(f"Data jurnal dengan ID {bucket_id} berhasil dihapus.")
 
     def close_connection(self):
         """

@@ -60,7 +60,7 @@ class DatabasePage(Screen):
         if not country or not city:
             self.status_label.text = "Both fields are required."
             return
-
+        
         try:
             # Tambahkan data ke tabel LOCATION
             self.db_entity.addData('LOCATION', country=country, city=city)

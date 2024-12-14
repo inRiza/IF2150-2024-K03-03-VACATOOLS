@@ -1,4 +1,5 @@
 from kivy.uix.screenmanager import Screen
+from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -45,9 +46,9 @@ class FormJournalPage(Screen):
         self.layout.add_widget(self.journal_description_input)
 
         # Input untuk memilih image (opsional)
-        self.image_path_input = TextInput(hint_text="Select Image (Optional)", multiline=False, readonly=True)
-        self.layout.add_widget(Label(text="Image Path:"))
-        self.layout.add_widget(self.image_path_input)
+        # self.image_path_input = TextInput(hint_text="Select Image (Optional)", multiline=False, readonly=True)
+        # self.layout.add_widget(Label(text="Image Path:"))
+        # self.layout.add_widget(self.image_path_input)
 
         # Tombol untuk membuka file chooser
         # self.select_image_button = Button(text="Choose Image")
@@ -94,7 +95,7 @@ class FormJournalPage(Screen):
             city = self.journal_city_input.text.strip()
             date = self.journal_date_input.text.strip()
             description = self.journal_description_input.text.strip() or None
-            #image_path = self.image_path_input.text.strip() or None  # Menambahkan image_path
+            # image_path = self.image_path_input.text.strip() or None  # Menambahkan image_path
 
             # Validasi input menggunakan ViewJournalController
             self.view_controller.validate_input(
@@ -109,8 +110,8 @@ class FormJournalPage(Screen):
                 city=city,
                 date=date,
                 description=description,
-                # iage_path=image_path  # Menambahkan image_path
-            )  
+                # image_path=image_path  # Menambahkan image_path
+            )
 
             # Simpan jurnal ke database menggunakan DatabaseJournalController
             self.db_journal_controller.save_journal_entry(new_journal)
@@ -124,7 +125,20 @@ class FormJournalPage(Screen):
             # self.image_path_input.text = ""  # Reset image path
 
             print("Journal saved successfully!")
+
+            # # Navigasi kembali ke halaman JOURNAL_LOG
+            # self.manager.current = "JOURNAL_LOG"
+
+            # # Tunggu sampai perpindahan halaman selesai sebelum merestart aplikasi
+            # App.get_running_app().stop()  # Stop app
+
+            # # Restart app using subprocess
+            # subprocess.Popen([sys.executable] + sys.argv)  # Restart the app
+            # sys.exit()  # Exit the current process
+
         except ValueError as e:
             print(f"Error: {e}")
         except Exception as e:
             print(f"Unexpected error: {e}")
+
+

@@ -51,7 +51,15 @@ class DatabaseJournalController:
             return dict(zip(columns, result[0]))  # Mengubah hasil menjadi dictionary dengan nama kolom sebagai key
         return None  # Jika tidak ada hasil
 
+    def delete_journal_by_id(self, journal_id: int):
+        """
+        Menghapus entri jurnal dari database berdasarkan ID.
+        """
+        query = f"DELETE FROM JOURNAL_LOG WHERE id = {journal_id}"
+        self.db.executeQuery(query)
+        print(f"Data jurnal dengan ID {journal_id} berhasil dihapus.")
 
+    
     def close_connection(self):
         """
         Menutup koneksi database.

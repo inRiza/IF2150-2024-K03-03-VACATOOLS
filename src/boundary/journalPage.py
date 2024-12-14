@@ -1,5 +1,6 @@
 from kivy.uix.screenmanager import Screen
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -8,6 +9,8 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from img.font.fontManager import FontManager  # Import FontManager untuk Poppins
 from ..controller.databaseJournalController import DatabaseJournalController  # Make sure to import the controller
+import subprocess
+import sys
 
 class JournalPage(Screen):
     def __init__(self, **kwargs):
@@ -175,11 +178,38 @@ class JournalPage(Screen):
         journal_id = journal['id']
         self.manager.current = "VIEW_JOURNAL"
         self.manager.get_screen("").__init__(journal_id)
+        App.get_running_app().reload_app()
 
     def on_delete_pressed(self, journal):
-        """Handle the delete button press."""
-        print(f"Deleting journal: {journal['title']}")
+        """
+        Handle tombol delete yang ditekan.
+        """
+        journal_id = journal['id']
+
+        # Hapus data dari database
+        self.db_controller.delete_journal_by_id(journal_id)
+        print(f"Jurnal dengan ID {journal_id} berhasil dihapus.")
+
+        # Perbarui daftar jurnal di memori
+        self.journal_entries = self.db_controller.get_all_journal_entries()
+
+        # Schedule restart aplikasi setelah beberapa detik untuk memastikan penghapusan selesai
+        Clock.schedule_once(self.restart_app, 0.5)  # Restart setelah 0.5 detik
+
 
     def on_create_button_press(self, instance):
         """Navigate to the FormJournalPage when the button is pressed."""
         self.manager.current = "FORM_JOURNAL"
+    
+    def restart_app(self, dt):
+        """Restart aplikasi menggunakan subprocess."""
+        print("Aplikasi akan di-restart...")
+
+        # Menghentikan aplikasi
+        App.get_running_app().stop()
+
+        # Gunakan subprocess untuk menjalankan ulang aplikasi
+        subprocess.Popen([sys.executable, sys.argv[0]])
+
+        # Keluar dari aplikasi yang sedang berjalan
+        sys.exit()

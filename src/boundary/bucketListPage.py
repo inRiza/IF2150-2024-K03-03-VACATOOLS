@@ -1,5 +1,6 @@
 from kivy.uix.screenmanager import Screen
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -8,6 +9,8 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from img.font.fontManager import FontManager  # Import FontManager untuk Poppins
 from ..controller.databaseBucketListController import DatabaseBucketListController
+import subprocess
+import sys
 
 class BucketListPage(Screen):
     def __init__(self, **kwargs):
@@ -182,9 +185,36 @@ class BucketListPage(Screen):
         self.manager.get_screen("").__init__(bucket_id)
 
     def on_delete_pressed(self, bucket):
-        """Handle the delete button press."""
-        print(f"Deleting bucket: {bucket['title']}")
+        """
+        Handle tombol delete yang ditekan.
+        """
+        bucket_id = bucket['id']
+
+        # Hapus data dari database
+        self.db_controller.delete_bucket_by_id(bucket_id)
+        print(f"Jurnal dengan ID {bucket_id} berhasil dihapus.")
+
+        # Perbarui daftar jurnal di memori
+        self.bucket_entries = self.db_controller.get_all_bucket_entries()
+
+        # Schedule restart aplikasi setelah beberapa detik untuk memastikan penghapusan selesai
+        Clock.schedule_once(self.restart_app, 0.5)  # Restart setelah 0.5 detik
+        
         
     def on_create_button_press(self, instance):
         """Navigate to the FormbucketPage when the button is pressed."""
         self.manager.current = "FORM_BUCKET"
+        
+    def restart_app(self, dt):
+        """Restart aplikasi menggunakan subprocess."""
+        print("Aplikasi akan di-restart...")
+
+        # Menghentikan aplikasi
+        App.get_running_app().stop()
+
+        # Gunakan subprocess untuk menjalankan ulang aplikasi
+        subprocess.Popen([sys.executable, sys.argv[0]])
+
+        # Keluar dari aplikasi yang sedang berjalan
+        sys.exit()
+
