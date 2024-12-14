@@ -43,6 +43,7 @@ class DatabaseEntity:
             FOREIGN KEY (id) REFERENCES journal_log (id)
         );""")
         
+        # Location Table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS LOCATION (
             country TEXT NOT NULL,
             city TEXT NOT NULL
@@ -69,14 +70,16 @@ class DatabaseEntity:
         self.conn.commit()  # Pastikan perubahan disimpan
         print(f"Data berhasil ditambahkan ke {namaTabel}")
 
-
-
     def getData(self, namaTabel: str, *kolom):
         query = f"SELECT {', '.join(kolom) if kolom else '*'} FROM {namaTabel}"
+        print(f"Executing query: {query}")  # Debugging log
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
         columns = [desc[0] for desc in self.cursor.description]
-        return [dict(zip(columns, row)) for row in rows]
+        result = [dict(zip(columns, row)) for row in rows]
+        print(f"Fetched data: {result}")  # Debugging log
+        return result
+
 
     def executeQuery(self, query: str):
         """
