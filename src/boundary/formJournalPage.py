@@ -75,14 +75,14 @@ class FormJournalPage(Screen):
                 country=country,
                 city=city,
                 date=date,
-                description=description,
+                description=description
             )
 
             # Simpan jurnal ke database menggunakan DatabaseJournalController
             self.db_journal_controller.save_journal_entry(new_journal)
 
             # Tambahkan data statistik ke tabel STATISTIC
-            self.db_statistic_controller.update_country_visit_statistics()  # Tambahkan statistik
+            self.db_statistic_controller.update_country_visit_statistics()
 
             # Reset form setelah berhasil menyimpan
             self.journal_title_input.text = ""

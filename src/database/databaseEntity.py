@@ -14,6 +14,8 @@ class DatabaseEntity:
 
     def _initialize_tables(self):
         """Ensure all tables exist."""
+        self.cursor.execute("DROP TABLE IF EXISTS JOURNAL_LOG")
+
         # Journal Log Table
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS JOURNAL_LOG (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
