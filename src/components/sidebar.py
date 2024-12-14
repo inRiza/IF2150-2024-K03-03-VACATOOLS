@@ -1,5 +1,6 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.image import Image
 from kivy.uix.widget import Widget
 from kivy.graphics import Color, Rectangle
 from kivy.app import App
@@ -19,7 +20,7 @@ class Sidebar(BoxLayout):
         with self.canvas.before:
             Color(1, 1, 1, 1)
             self.bg_rect = Rectangle(size=self.size, pos=self.pos)
-            
+
             # Tambahkan gradien
             self.gradients = []
             num_steps = 50
@@ -44,7 +45,18 @@ class Sidebar(BoxLayout):
         # Pusatkan tombol secara vertikal
         self.center_layout = BoxLayout(orientation='vertical', size_hint=(1, None), spacing=10)
         self.center_layout.bind(minimum_height=self.center_layout.setter('height'))
-        self.add_widget(Widget())  # Spacer di atas
+        self.add_widget(Widget(size_hint_y=None, height=40))  # Spacer di atas untuk menaikkan logo
+
+        # Tambahkan gambar logo di atas tombol navigasi
+        logo = Image(
+            source="img/Logo_Vacatools.png",
+            size_hint=(1, None),  # Lebar sesuai sidebar, tinggi menyesuaikan
+            height=125,  # 2.5 kali lebih besar (50 * 2.5 = 125)
+            allow_stretch=True,
+            keep_ratio=True
+        )
+        self.center_layout.add_widget(logo)
+
         self.add_widget(self.center_layout)
         self.add_widget(Widget())  # Spacer di bawah
 
