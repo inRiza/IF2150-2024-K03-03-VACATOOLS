@@ -50,14 +50,6 @@ class DatabaseStatisticController:
         result = self.db.executeQuery(query)
         return [{"country": row[0], "total_visits": row[1]} for row in result]
 
-    def fetch_country_city_from_journal(self):
-        """
-        Mengambil daftar country dan city dari tabel journal_log di database.
-        """
-        query = "SELECT DISTINCT nama_negara AS country, nama_kota AS city FROM journal_log"
-        result = self.db.executeQuery(query)
-        return [{"country": row[0], "city": row[1]} for row in result]
-
     def calculate_country_counts(self):
         """
         Menghitung jumlah kunjungan berdasarkan country dari tabel journal_log.
