@@ -11,9 +11,8 @@ from io import BytesIO
 from ..controller.viewStatisticController import ViewStatisticController
 from ..controller.databaseStatisticController import DatabaseStatisticController
 
-
 class StatisticPage(Screen):
-    def __init__(self, db_controller, **kwargs):
+    def __init__(self, db_controller: DatabaseStatisticController, **kwargs):
         super().__init__(**kwargs)
 
         # Inisialisasi Controller
@@ -61,7 +60,7 @@ class StatisticPage(Screen):
         """
         # Ambil data statistik dari controller
         try:
-            statistics = self.statistic_controller.get_statistic()
+            statistics = self.statistic_controller.db_controller.get_country_visit_statistics()
         except Exception as e:
             self.show_popup("Error", f"Failed to fetch statistics: {str(e)}")
             return
@@ -70,25 +69,17 @@ class StatisticPage(Screen):
             self.show_popup("No Data", "No statistics data available!")
             return
 
-        # Hitung jumlah kunjungan per negara
-        country_count = {}
-        for stat in statistics:
-            country_count[stat.country] = country_count.get(stat.country, 0) + stat.total
-
-        if not country_count:
-            self.show_popup("No Data", "No statistics data available!")
-            return
+        # Extract data untuk chart
+        countries = [stat["country"] for stat in statistics]
+        total_visits = [stat["total_visits"] for stat in statistics]
 
         # Generate chart menggunakan matplotlib
-        countries = list(country_count.keys())
-        counts = list(country_count.values())
-
         plt.figure(figsize=(10, 6))
-        plt.bar(countries, counts, color='skyblue')
+        plt.bar(countries, total_visits, color='skyblue')
         plt.title("Number of Visits per Country")
         plt.xlabel("Country")
         plt.ylabel("Visit Count")
-        plt.xticks(rotation=45, ha='right')  # Rotasi label untuk keterbacaan
+        plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
 
         # Simpan chart ke dalam buffer
@@ -99,9 +90,7 @@ class StatisticPage(Screen):
 
         # Tampilkan chart di popup
         self.show_chart_popup(buffer)
-        buffer.close()  # Tutup buffer setelah digunakan
-
-
+        buffer.close()
 
     def show_popup(self, title, message):
         """
