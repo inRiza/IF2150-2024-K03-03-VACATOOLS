@@ -49,12 +49,27 @@ class DatabaseEntity:
         );""")
 
     def addData(self, namaTabel: str, **data):
+        # Cek apakah data sudah ada berdasarkan title, country, dan city
+        if 'title' in data and 'country' in data and 'city' in data:
+            query = f"""
+            SELECT COUNT(*) FROM {namaTabel} 
+            WHERE title = ? AND country = ? AND city = ?
+            """
+            self.cursor.execute(query, (data['title'], data['country'], data['city']))
+            count = self.cursor.fetchone()[0]
+            if count > 0:
+                print(f"Data dengan title '{data['title']}', country '{data['country']}', dan city '{data['city']}' sudah ada.")
+                return  # Data sudah ada, tidak perlu ditambahkan lagi
+        
+        # Lanjutkan menambahkan data jika belum ada
         columns = ", ".join(data.keys())
         placeholders = ", ".join(["?"] * len(data))
         query = f"INSERT INTO {namaTabel} ({columns}) VALUES ({placeholders})"
         self.cursor.execute(query, tuple(data.values()))
         self.conn.commit()  # Pastikan perubahan disimpan
         print(f"Data berhasil ditambahkan ke {namaTabel}")
+
+
 
     def getData(self, namaTabel: str, *kolom):
         query = f"SELECT {', '.join(kolom) if kolom else '*'} FROM {namaTabel}"
