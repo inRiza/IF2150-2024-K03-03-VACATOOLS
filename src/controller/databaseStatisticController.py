@@ -90,10 +90,8 @@ class DatabaseStatisticController:
         # Hitung jumlah kunjungan per country
         for entry in journal_data:
             country = entry["country"]
-            if country in country_count:
-                country_count[country] += 1
-            else:
-                country_count[country] = 1
+            country_count[country] = 1
+    
 
         print(f"Hitungan per negara: {country_count}")  # Debugging
 
@@ -103,3 +101,31 @@ class DatabaseStatisticController:
             print(f"Data ditambahkan ke STATISTIC: {country}, count: {count}")  # Debugging
 
         print("Statistik kunjungan berhasil diperbarui dari JOURNAL_LOG.")
+
+    def delete_statistic_by_country(self, country):
+        """
+        Hapus statistik berdasarkan negara yang diberikan.
+        """
+        query = """
+        SELECT country, SUM(count) as total_visits
+        FROM STATISTIC
+        WHERE country = ?
+        GROUP BY country
+        """
+        # Menggunakan tuple untuk parameter
+        result = self.db.executeQuery2(query, (country, ))
+        
+        if result:
+            total_visits = result[0][1] - 1  # Mengurangi 1 pada total_visits
+            # Perbarui tabel STATISTIC untuk negara tersebut
+            update_query = """
+            UPDATE STATISTIC
+            SET count = ?
+            WHERE country = ?
+            """
+            # Menggunakan tuple untuk parameter
+            self.db.executeQuery2(update_query, (total_visits, country))
+            print(f"Statistik negara {country} berhasil diperbarui. Total kunjungan: {total_visits}")
+        else:
+            print(f"Tidak ada data statistik untuk negara {country}.")
+
