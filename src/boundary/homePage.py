@@ -89,7 +89,7 @@ class HomePage(Screen):
         """Create a button with a transparent fill and a visible rounded border."""
         button = Button(
             text=text,
-            size_hint=(0.4, None),  # 60% width of layout, fixed height
+            size_hint=(0.4, None),  # 40% width of layout, fixed height
             height=40,  # Fixed button height
             pos_hint={"center_x": 0.5},  # Center the button horizontally
             background_normal='',  # Remove the default background image
@@ -99,7 +99,7 @@ class HomePage(Screen):
             font_name=FontManager.get_font_name("Regular"),  # Gunakan Poppins Regular
         )
 
-        # Add only the border with a transparent fill
+        # Tambahkan border dengan RoundedRectangle
         with button.canvas.before:
             Color(72 / 255, 167 / 255, 215 / 255, 1)  # Border color (blue)
             button.border_rect = RoundedRectangle(
@@ -109,7 +109,16 @@ class HomePage(Screen):
         # Bind to update the border dynamically when button size or position changes
         button.bind(size=self._update_border, pos=self._update_border)
 
+        # Tambahkan aksi pada tombol
+        if text == "Journal Log":
+            button.bind(on_press=lambda instance: setattr(self.manager, 'current', 'JOURNAL_LOG'))
+        elif text == "Bucket List":
+            button.bind(on_press=lambda instance: setattr(self.manager, 'current', 'BUCKET_LIST'))
+        elif text == "Check Statistic":
+            button.bind(on_press=lambda instance: setattr(self.manager, 'current', 'STATISTIC'))
+
         return button
+
 
     def _update_border(self, instance, *args):
         """Update the size and position of the border rectangle dynamically."""
