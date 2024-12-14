@@ -104,28 +104,20 @@ class DatabaseStatisticController:
 
     def delete_statistic_by_country(self, country):
         """
-        Hapus statistik berdasarkan negara yang diberikan.
+        Menghapus entri statistik dari tabel STATISTIC berdasarkan negara yang diberikan.
         """
-        query = """
-        SELECT country, SUM(count) as total_visits
-        FROM STATISTIC
-        WHERE country = ?
-        GROUP BY country
-        """
-        # Menggunakan tuple untuk parameter
-        result = self.db.executeQuery2(query, (country, ))
+        # Periksa apakah data dengan country tersebut ada
+        select_query = "SELECT id FROM STATISTIC WHERE country = ? LIMIT 1"
+        result = self.db.executeQuery2(select_query, (country,))
         
         if result:
-            total_visits = result[0][1] - 1  # Mengurangi 1 pada total_visits
-            # Perbarui tabel STATISTIC untuk negara tersebut
-            update_query = """
-            UPDATE STATISTIC
-            SET count = ?
-            WHERE country = ?
-            """
-            # Menggunakan tuple untuk parameter
-            self.db.executeQuery2(update_query, (total_visits, country))
-            print(f"Statistik negara {country} berhasil diperbarui. Total kunjungan: {total_visits}")
+            # Ambil ID entri pertama yang ditemukan
+            id_to_delete = result[0][0]
+            
+            # Hapus entri berdasarkan ID
+            delete_query = "DELETE FROM STATISTIC WHERE id = ?"
+            self.db.executeQuery2(delete_query, (id_to_delete,))
+            
+            print(f"Entri statistik untuk negara '{country}' berhasil dihapus.")
         else:
-            print(f"Tidak ada data statistik untuk negara {country}.")
-
+            print(f"Tidak ada entri statistik untuk negara '{country}' yang ditemukan.")
