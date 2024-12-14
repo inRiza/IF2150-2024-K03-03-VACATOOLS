@@ -83,6 +83,7 @@ class FormBucketPage(Screen):
     #     else:
     #         self.image_path_input.text = ""
 
+    
     def save_bucket(self, instance):
         """
         Simpan jurnal baru menggunakan ViewbucketController dan DatabasebucketController.

@@ -3,9 +3,11 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
+from tkinter import Tk, Button as TkButton
+from tkcalendar import Calendar  # Import kalender dari tkcalendar
 from ..controller.viewJournalController import ViewJournalController
 from ..controller.databaseJournalController import DatabaseJournalController
-from ..controller.databaseStatisticController import DatabaseStatisticController  # Tambahkan import
+from ..controller.databaseStatisticController import DatabaseStatisticController
 
 class FormJournalPage(Screen):
     def __init__(self, **kwargs):
@@ -36,10 +38,13 @@ class FormJournalPage(Screen):
         self.layout.add_widget(Label(text="City:"))
         self.layout.add_widget(self.journal_city_input)
 
-        # Input untuk date
-        self.journal_date_input = TextInput(hint_text="Enter Date (YYYY-MM-DD)", multiline=False)
-        self.layout.add_widget(Label(text="Date:"))
-        self.layout.add_widget(self.journal_date_input)
+        # Input untuk date dengan Calendar dari tkinter
+        self.journal_date_label = Label(text="Date: Not Selected")  # Label untuk menampilkan tanggal
+        self.layout.add_widget(self.journal_date_label)
+
+        self.date_picker_button = Button(text="Select Date")  # Tombol untuk membuka kalender
+        self.date_picker_button.bind(on_press=self.show_date_picker)
+        self.layout.add_widget(self.date_picker_button)
 
         # Input untuk description (opsional)
         self.journal_description_input = TextInput(hint_text="Enter Description (Optional)", multiline=True)
@@ -52,6 +57,24 @@ class FormJournalPage(Screen):
         self.layout.add_widget(self.save_button)
 
         self.add_widget(self.layout)
+
+    def show_date_picker(self, instance):
+        """
+        Tampilkan widget kalender tkinter untuk memilih tanggal.
+        """
+        def on_date_selected():
+            self.selected_date = cal.get_date()  # Ambil tanggal yang dipilih
+            self.journal_date_label.text = f"Date: {self.selected_date}"
+            root.destroy()  # Tutup jendela tkinter
+
+        root = Tk()  # Buat root tkinter
+        root.title("Select Date")
+        cal = Calendar(root, date_pattern="yyyy-mm-dd")  # Widget kalender
+        cal.pack(pady=60)
+        select_button = TkButton(root, text="Select", command=on_date_selected)
+        select_button.pack(pady=10)
+        root.mainloop()
+
 
     def save_journal(self, instance):
         """
@@ -68,7 +91,7 @@ class FormJournalPage(Screen):
             title = self.journal_title_input.text.strip()
             country = self.journal_country_input.text.strip()
             city = self.journal_city_input.text.strip()
-            date = self.journal_date_input.text.strip()
+            date = getattr(self, 'selected_date', None)  # Gunakan tanggal yang dipilih
             description = self.journal_description_input.text.strip() or None
 
             # Validasi input menggunakan ViewJournalController
@@ -97,7 +120,7 @@ class FormJournalPage(Screen):
             self.journal_title_input.text = ""
             self.journal_country_input.text = ""
             self.journal_city_input.text = ""
-            self.journal_date_input.text = ""
+            self.journal_date_label.text = "Date: Not Selected"
             self.journal_description_input.text = ""
 
             print("Journal and statistics saved successfully!")
@@ -109,4 +132,3 @@ class FormJournalPage(Screen):
 
         finally:
             self.is_saving = False  # Reset flag setelah penyimpanan selesai
-
