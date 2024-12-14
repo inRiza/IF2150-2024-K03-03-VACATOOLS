@@ -93,7 +93,32 @@ class DatabaseEntity:
         except sqlite3.Error as e:
             print(f"Error executing query: {e}")
             return None
+        
+    def executeQuery2(self, query: str, params=None):
+        """
+        Menjalankan query SQL dengan parameter opsional.
+        - query: SQL query yang akan dijalankan.
+        - params: Parameter opsional yang digunakan dalam query (biasanya dalam bentuk tuple).
+        """
+        if params is None:
+            params = ()
 
+        try:
+            self.cursor.execute(query, params)
+            
+            # Jika query adalah SELECT, kembalikan hasilnya
+            if query.strip().upper().startswith('SELECT'):
+                return self.cursor.fetchall()
+            
+            # Untuk query selain SELECT (INSERT, DELETE, UPDATE), commit perubahan ke database
+            self.conn.commit()
+            return None  # Tidak ada hasil untuk query selain SELECT
+
+        except sqlite3.Error as e:
+            print(f"Terjadi kesalahan saat menjalankan query: {e}")
+            self.conn.rollback()
+            return None
+    
     def close(self):
         """Close the database connection."""
         if self.conn:
