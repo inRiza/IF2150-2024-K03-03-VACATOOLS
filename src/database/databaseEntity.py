@@ -21,8 +21,7 @@ class DatabaseEntity:
             country TEXT NOT NULL,
             city TEXT NOT NULL,
             date TEXT NOT NULL,
-            description TEXT,
-            image_path TEXT
+            description TEXT
         );""")
 
         # Bucket List Table
