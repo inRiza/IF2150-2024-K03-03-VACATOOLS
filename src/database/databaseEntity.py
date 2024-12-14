@@ -72,14 +72,14 @@ class DatabaseEntity:
 
     def getData(self, namaTabel: str, *kolom):
         query = f"SELECT {', '.join(kolom) if kolom else '*'} FROM {namaTabel}"
-        print(f"Executing query: {query}")  # Log query yang dijalankan
+        print(f"Executing query: {query}")  # Debugging log
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
-        print(f"Rows fetched: {rows}")  # Log hasil rows yang diambil
         columns = [desc[0] for desc in self.cursor.description]
         result = [dict(zip(columns, row)) for row in rows]
-        print(f"Fetched data: {result}")  # Log hasil konversi ke dictionary
+        print(f"Fetched data: {result}")  # Debugging log
         return result
+
 
     def executeQuery(self, query: str):
         """

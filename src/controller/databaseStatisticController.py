@@ -75,6 +75,7 @@ class DatabaseStatisticController:
         query = "SELECT country, city FROM JOURNAL_LOG"
         result = self.db.executeQuery(query)
         return [{"country": row[0], "city": row[1]} for row in result]
+
     def update_country_visit_statistics(self):
         """
         Menghitung jumlah kunjungan per country dari tabel JOURNAL_LOG
