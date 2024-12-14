@@ -183,7 +183,7 @@ class FormJournalPage(Screen):
             )
 
             # Save the journal to the database
-            self.db_journal_controller.save_journal(new_journal)
+            self.db_journal_controller.save_journal_entry(new_journal)
             
             # Tambahkan data statistik ke tabel STATISTIC
             print("Updating country visit statistics...")  # Debugging log

@@ -9,6 +9,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.boxlayout import BoxLayout
 from img.font.fontManager import FontManager  # Import FontManager untuk Poppins
 from ..controller.databaseJournalController import DatabaseJournalController  # Make sure to import the controller
+from ..controller.databaseStatisticController import DatabaseStatisticController
 import subprocess
 import sys
 
@@ -18,6 +19,7 @@ class JournalPage(Screen):
 
         # Initialize DatabaseJournalController and retrieve journal entries
         self.db_controller = DatabaseJournalController("database.db")
+        self.statistic_controller = DatabaseStatisticController("database.db")  # Inisialisasi controller statistik
         self.journal_entries = self.db_controller.get_all_journal_entries()
 
         # Add background color using canvas.before
@@ -185,20 +187,28 @@ class JournalPage(Screen):
         Handle tombol delete yang ditekan.
         """
         journal_id = journal['id']
+        country = journal['country']  # Ambil nama negara dari jurnal yang dihapus
 
         # Hapus data dari database
         self.db_controller.delete_journal_by_id(journal_id)
         print(f"Jurnal dengan ID {journal_id} berhasil dihapus.")
 
+        # Update statistik negara dengan mengurangi count
+        self.statistic_controller.delete_statistic_by_country(country)  # Panggil controller statistik
+
         # Perbarui daftar jurnal di memori
         self.journal_entries = self.db_controller.get_all_journal_entries()
+
 
         # Schedule restart aplikasi setelah beberapa detik untuk memastikan penghapusan selesai
         Clock.schedule_once(self.restart_app, 0.5)  # Restart setelah 0.5 detik
 
 
     def on_create_button_press(self, instance):
-        """Navigate to the FormJournalPage when the button is pressed."""
+        """
+        Handle tombol create yang ditekan untuk membuat jurnal baru.
+        """
+        # Pindah ke halaman untuk membuat jurnal baru
         self.manager.current = "FORM_JOURNAL"
     
     def restart_app(self, dt):
