@@ -3,13 +3,15 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.clock import Clock  # Pastikan Clock digunakan untuk update UI
-from tkinter import Tk, Toplevel, Listbox, Button as TkButton, SINGLE
-from tkcalendar import Calendar  # Tambahkan impor Calendar dari tkcalendar
+from kivy.clock import Clock 
+from kivy.uix.spinner import Spinner
 from ..controller.viewJournalController import ViewJournalController
 from ..controller.databaseJournalController import DatabaseJournalController
 from ..controller.databaseStatisticController import DatabaseStatisticController
 from ..database.databaseEntity import DatabaseEntity
+from tkinter import Tk, Toplevel, Listbox, Button as TkButton 
+from tkcalendar import Calendar 
+from pathlib import Path
 
 
 class FormJournalPage(Screen):
@@ -17,12 +19,12 @@ class FormJournalPage(Screen):
         super().__init__(**kwargs)
         self.is_saving = False
         self.locations = []  # Inisialisasi self.locations agar tidak terjadi AttributeError
-
+        db_path = Path(__file__).parent.parent / 'database' / 'database.db'
         # Inisialisasi Controller
         self.db_journal_controller = DatabaseJournalController(db_name="database.db")
         self.db_statistic_controller = DatabaseStatisticController(db_name="database.db")
         self.view_controller = ViewJournalController(db_controller=self.db_journal_controller)
-        self.db_entity = DatabaseEntity(db_path="database.db")
+        self.db_entity = DatabaseEntity(db_path=db_path)
 
         # Layout untuk form
         self.layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
@@ -32,19 +34,28 @@ class FormJournalPage(Screen):
         self.layout.add_widget(Label(text="Journal Title:"))
         self.layout.add_widget(self.journal_title_input)
 
-        # Tombol untuk memilih country
+        # Spinner untuk memilih country
         self.layout.add_widget(Label(text="Country:"))
-        self.country_button = Button(text="Select Country")
-        self.country_button.bind(on_press=self.show_country_picker)
-        self.layout.add_widget(self.country_button)
+        self.country_spinner = Spinner(
+            text='Select Country',
+            values=[],  # Akan diupdate dengan data negara
+            size_hint=(None, None),
+            size=(200, 44)
+        )
+        self.country_spinner.bind(text=self.on_country_select)
+        self.layout.add_widget(self.country_spinner)
 
-        # Tombol untuk memilih city
+        # Spinner untuk memilih city
         self.layout.add_widget(Label(text="City:"))
-        self.city_button = Button(text="Select City")
-        self.city_button.bind(on_press=self.show_city_picker)
-        self.layout.add_widget(self.city_button)
+        self.city_spinner = Spinner(
+            text='Select City',
+            values=[],  # Akan diupdate dengan data kota
+            size_hint=(None, None),
+            size=(200, 44)
+        )
+        self.layout.add_widget(self.city_spinner)
 
-        # Input untuk date dengan Calendar dari tkinter
+        # Input untuk date
         self.journal_date_label = Label(text="Date: Not Selected")
         self.layout.add_widget(self.journal_date_label)
 
@@ -72,14 +83,15 @@ class FormJournalPage(Screen):
         Load data untuk country dan city dari tabel LOCATION.
         """
         try:
-            locations = self.db_entity.getData("LOCATION", "country", "city")
-            print(f"Fetched locations from database: {locations}")  # Debugging log
-            if not locations:
+            location_data = self.db_entity.getData("LOCATION", "country", "city")
+            if not location_data:
                 print("No locations found in the database.")
                 return
-            self.locations = [{"country": row["country"], "city": row["city"]} for row in locations]
+
+            # Mengubah data mentah menjadi objek LocationEntity
+            self.locations = [{"country": row["country"], "city": row["city"]} for row in location_data]
             print(f"Processed locations: {self.locations}")  # Debugging log
-            
+
             # Memperbarui UI setelah data dimuat
             Clock.schedule_once(self.update_ui, 0)
         except Exception as e:
@@ -94,73 +106,32 @@ class FormJournalPage(Screen):
         if not self.locations:
             print("No locations available to update the UI.")
             return
-        
-        # Memanggil show_country_picker untuk memperbarui dropdown
-        self.show_country_picker(None)  # Panggil untuk memperbarui dropdown country
 
-    def show_country_picker(self, instance):
-        """
-        Menampilkan daftar country dari data yang diambil langsung lewat DatabaseEntity.
-        """
-        if not self.locations:
-            print("No locations loaded. Ensure database is set up correctly.")
-            return
-
+        # Mengupdate spinner untuk country dengan nilai yang ada di self.locations
         countries = sorted({loc["country"] for loc in self.locations})
-        if not countries:
-            print("No countries found.")
+        self.country_spinner.values = countries  # Mengupdate pilihan country pada spinner
+        if countries:
+            self.country_spinner.text = countries[0]  # Menampilkan country pertama sebagai default
+
+
+    def on_country_select(self, spinner, text):
+        """
+        Handle selection of country from Spinner.
+        Update the cities dropdown based on selected country.
+        """
+        print(f"Selected country: {text}")
+        if not text or text == "Select Country":
+            print("Please select a valid country.")
             return
 
-        def on_select():
-            selected = listbox.get(listbox.curselection())
-            self.country_button.text = selected
-            self.city_button.text = "Select City"
-            popup.destroy()
-
-        popup = Toplevel()
-        popup.title("Select Country")
-        popup.geometry("300x400")
-
-        listbox = Listbox(popup, selectmode=SINGLE, height=20)
-        for country in countries:
-            print(f"Inserting country: {country}")  # Debugging log
-            listbox.insert("end", country)
-        listbox.pack(pady=10)
-
-        select_button = TkButton(popup, text="Select", command=on_select)
-        select_button.pack(pady=10)
-
-    def show_city_picker(self, instance):
-        """
-        Menampilkan daftar city berdasarkan country yang dipilih.
-        """
-        selected_country = self.country_button.text
-        if not selected_country or selected_country == "Select Country":
-            print("Please select a country first.")
-            return
-
-        cities = sorted({loc["city"] for loc in self.locations if loc["country"] == selected_country})
+        cities = sorted({loc["city"] for loc in self.locations if loc["country"] == text})
         if not cities:
-            print(f"No cities found for the country: {selected_country}.")
+            print(f"No cities found for the country: {text}.")
             return
 
-        def on_select():
-            selected = listbox.get(listbox.curselection())
-            self.city_button.text = selected
-            popup.destroy()
-
-        popup = Toplevel()
-        popup.title("Select City")
-        popup.geometry("300x400")
-
-        listbox = Listbox(popup, selectmode=SINGLE, height=20)
-        for city in cities:
-            print(f"Inserting city: {city}")  # Debugging log
-            listbox.insert("end", city)
-        listbox.pack(pady=10)
-
-        select_button = TkButton(popup, text="Select", command=on_select)
-        select_button.pack(pady=10)
+        # Update city spinner with cities from selected country
+        self.city_spinner.values = cities
+        self.city_spinner.text = "Select City"  # Reset city spinner text
 
     def show_date_picker(self, instance):
         """
@@ -191,16 +162,18 @@ class FormJournalPage(Screen):
             self.is_saving = True
 
             title = self.journal_title_input.text.strip()
-            country = self.country_button.text.strip()
-            city = self.city_button.text.strip()
+            country = self.country_spinner.text.strip()
+            city = self.city_spinner.text.strip()
             date = getattr(self, 'selected_date', None)
             description = self.journal_description_input.text.strip() or None
 
+            # Validate the inputs
             self.view_controller.validate_input(
                 ['title', 'country', 'city', 'date'],
                 title=title, country=country, city=city, date=date
             )
 
+            # Create a new journal object
             new_journal = self.view_controller.create_journal(
                 title=title,
                 country=country,
@@ -209,22 +182,25 @@ class FormJournalPage(Screen):
                 description=description,
             )
 
-            self.db_journal_controller.save_journal_entry(new_journal)
-            self.db_statistic_controller.update_country_visit_statistics()
+            # Save the journal to the database
+            self.db_journal_controller.save_journal(new_journal)
+            
+            # Tambahkan data statistik ke tabel STATISTIC
+            print("Updating country visit statistics...")  # Debugging log
+            self.db_statistic_controller.update_country_visit_statistics()  # Update statistics
 
+            # Reset form after saving successfully
             self.journal_title_input.text = ""
-            self.country_button.text = "Select Country"
-            self.city_button.text = "Select City"
+            self.country_spinner.text = 'Select Country'
+            self.city_spinner.text = 'Select City'
             self.journal_date_label.text = "Date: Not Selected"
             self.journal_description_input.text = ""
 
             print("Journal and statistics saved successfully!")
 
-        except ValueError as e:
-            print(f"Error: {e}")
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-
-        finally:
             self.is_saving = False
+            print("Journal saved successfully.")
 
+        except Exception as e:
+            print(f"Error saving journal: {e}")
+            self.is_saving = False
