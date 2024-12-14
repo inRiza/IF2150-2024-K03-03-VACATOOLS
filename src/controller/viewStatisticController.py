@@ -52,7 +52,7 @@ class ViewStatisticController:
     def search_statistic(self, query, attribute="title"):
         """
         Search statistic by a specific attribute (default: title).
-        Supported attributes: title, country, city, description.
+        Supported attributes: country, city, count.
         """
         valid_attributes = {"title", "country", "city", "count"}
         if attribute not in valid_attributes:
@@ -77,9 +77,9 @@ class ViewStatisticController:
     def update_statistic(self, statistic_id, **updates):
         """
         Update a statistic's attributes by its ID.
-        Supported attributes: title, country, city, description.
+        Supported attributes: title, country, city.
         """
-        valid_attributes = {"country", "city", "description"}
+        valid_attributes = {"country", "city"}
         for statistic in self.statistic:
             if statistic.id == statistic_id:
                 for key, value in updates.items():

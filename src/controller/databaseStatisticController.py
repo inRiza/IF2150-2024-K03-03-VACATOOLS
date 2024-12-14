@@ -16,18 +16,17 @@ class DatabaseStatisticController:
         """
         # Mengubah objek statistic menjadi dictionary
         statistic_data = statistic_entry.to_dict()
-        # Menggunakan metode add_data dari DatabaseEntity untuk menyimpan data
+        # Menggunakan metode addData dari DatabaseEntity untuk menyimpan data
         self.db.addData("STATISTIC", **statistic_data)
-        print(f"Data statistik '{statistic_entry.title}' berhasil disimpan.")
+        print(f"Data statistik '{statistic_entry.country}' berhasil disimpan.")
 
     def get_country_city_data(self):
         """
         Mengambil daftar country dan city dari database.
         """
-        # Menggunakan query langsung dari DatabaseEntity
-        query = "SELECT DISTINCT Country, City FROM STATISTIC"  # Ganti dengan nama tabel Anda
-        result = self.db.executeQuery(query)  # Pastikan DatabaseEntity memiliki metode executeQuery
-        return result
+        query = "SELECT DISTINCT country, city FROM STATISTIC"
+        result = self.db.executeQuery(query)
+        return [{"country": row[0], "city": row[1]} for row in result]
 
     def get_all_statistic_entries(self):
         """
@@ -36,6 +35,19 @@ class DatabaseStatisticController:
         return self.db.getData(
             "STATISTIC", "id", "country", "city", "count"
         )
+
+    def get_country_visit_statistics(self):
+        """
+        Mengambil statistik jumlah kunjungan per negara dari database.
+        """
+        query = """
+        SELECT country, SUM(count) as total_visits
+        FROM STATISTIC
+        GROUP BY country
+        ORDER BY total_visits DESC
+        """
+        result = self.db.executeQuery(query)
+        return [{"country": row[0], "total_visits": row[1]} for row in result]
 
     def close_connection(self):
         """
