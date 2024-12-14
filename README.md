@@ -2,6 +2,7 @@
 
 ## Overview
 **VACATOOLS** is a project developed as part of the IF2150 course.
+
 Vacatools adalah perangkat lunak yang dirancang untuk membantu pengguna dalam membuat, menyusun, dan mengelola jurnal serta rencana perjalanan. Sistem ini bertujuan untuk meningkatkan efisiensi dalam pengorganisasian informasi terkait perjalanan dan pengalaman pribadi. Dengan menggunakan Vacatools, pengguna dapat mencatat kegiatan harian, menyimpan catatan penting, serta merancang rencana perjalanan dengan lebih mudah dan terstruktur.
 
 ## Anggota - VACATOOLS
@@ -32,6 +33,46 @@ Make sure you have **Python 3.x** installed on your machine.
 4. **Run the main.py**:
    ```python
    python main.py
+
+## Daftar Modul
+| NAMA Modul | Pembagian Tugas | 
+| ------------- | ------------- |
+| DatabaseStatisticController | Boye Mangaratua Ginting  | 
+| DatabaseJournalController | Ivant Samuel Silaban  |
+| JournalEntity | Ivant Samuel Silaban  |
+| BucketEntity | Rafa Abdussalam Danadyaksa  |
+| BucketEntity | Rafa Abdussalam Danadyaksa  |
+| DatabaseEntity | Muhamad Nazih Najmudin   |
+| DatabaseJournalController | Muhamad Nazih Najmudin   |
+| formJournalpage | Muhammad Rizain Firdaus  | 
+| formbBucketpage | Muhammad Rizain Firdaus  |
+
+## Tabel Journal
+| Nama Atribut  | Tipe Data | Deskripsi | 
+| ------------- | ------------- | ------------- |
+| id | INTEGER  | ID unik setiap entri |
+| title	TEXT | TEXT  | Judul aktivitas atau tujuan |
+| country | TEXT  | Negara tujuan |
+| city | TEXT   | Kota tujuan |
+| date | DATE   | Tanggal entri jurnal dibuat |
+| description | TEXT  | Penjelasan tujuan atau aktivitas | 
+
+## Tabel Bucket List
+| Nama Atribut  | Tipe Data | Deskripsi | 
+| ------------- | ------------- | ------------- |
+| id | INTEGER  | ID unik setiap entri |
+| title	TEXT | TEXT  | Judul aktivitas atau tujuan |
+| country | TEXT  | Negara tujuan |
+| city | TEXT   | Kota tujuan |
+| description | TEXT  | Penjelasan tujuan atau aktivitas | 
+
+## Tabel Statistic
+| Nama Atribut  | Tipe Data | Deskripsi | 
+| ------------- | ------------- | ------------- |
+| id | INTEGER  | ID unik setiap entri |
+| country | TEXT  | Negara tujuan |
+| city | TEXT   | Kota tujuan |
+| count | INTEGER  | Jumlah kunjungan atau entri | 
 
 
 ## Pembagian Tugas
